@@ -1668,15 +1668,23 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 			INNER JOIN \"SiteTree\" ON \"SiteTree\".\"ID\" = \"SiteTree_LinkTracking\".\"SiteTreeID\"
 			WHERE \"ChildID\" = $this->ID ")->value();
 		if($includeVirtuals) {
+			// verify the current class name in case the page has been converted
+			// and the VirtualPage record is an orphan
+			$virtualClasses = ClassInfo::subclassesFor('VirtualPage');
 			$virtuals = DB::query("SELECT COUNT(*) FROM \"VirtualPage\" 
 			INNER JOIN \"SiteTree\" ON \"SiteTree\".\"ID\" = \"VirtualPage\".\"ID\"
-			WHERE \"CopyContentFromID\" = $this->ID")->value();
+			WHERE \"SiteTree\".\"ClassName\" IN ('" . implode("','", $virtualClasses) . "')
+			  AND \"CopyContentFromID\" = $this->ID")->value();
 		} else {
 			$virtuals = 0;
 		}
+		// verify the current class name in case the page has been converted
+		// and the RedirectorPage record is an orphan
+		$redirectorClasses = ClassInfo::subclassesFor('RedirectorPage');
 		$redirectors = DB::query("SELECT COUNT(*) FROM \"RedirectorPage\" 
 			INNER JOIN \"SiteTree\" ON \"SiteTree\".\"ID\" = \"RedirectorPage\".\"ID\"
-			WHERE \"RedirectionType\" = 'Internal' AND \"LinkToID\" = $this->ID")->value();
+			WHERE \"SiteTree\".\"ClassName\" IN ('" . implode("','", $redirectorClasses) . "')
+			  AND \"RedirectionType\" = 'Internal' AND \"LinkToID\" = $this->ID")->value();
 			
 			
 		return 0 + $links + $virtuals + $redirectors;
@@ -1688,7 +1696,10 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 	function VirtualPages() {
 		if(!$this->ID) return null;
 		if(class_exists('Subsite')) {
-			return Subsite::get_from_all_subsites('VirtualPage', "\"CopyContentFromID\" = " . (int)$this->ID);
+			$virtualClasses = ClassInfo::subclassesFor('VirtualPage');
+			$filter = "\"SiteTree\".\"ClassName\" IN ('" . implode("','", $virtualClasses) . "') AND \"CopyContentFromID\" = " . (int)$this->ID;
+			$filter = "\"CopyContentFromID\" = " . (int)$this->ID;
+			return Subsite::get_from_all_subsites('VirtualPage', $filter);
 		} else {
 			return DataObject::get('VirtualPage', "\"CopyContentFromID\" = " . (int)$this->ID);
 		}
