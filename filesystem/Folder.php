@@ -371,6 +371,7 @@ class Folder extends File {
 			array("Title" => _t('Folder.TITLE', "Title"), "Filename" => _t('Folder.FILENAME', "Filename")),
 			""
 		);
+		$fileList->setPageSize(100);
 		$fileList->setFolder($this);
 		$fileList->setPopupCaption(_t('Folder.VIEWEDITASSET', "View/Edit Asset"));
 
