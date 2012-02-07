@@ -29,9 +29,9 @@ class GD extends Object {
 		// If we're working with image resampling, things could take a while.  Bump up the time-limit
 		increase_time_limit_to(300);
 
-		if($filename) {
+		if($filename && is_readable($filename)) {
 			// We use getimagesize instead of extension checking, because sometimes extensions are wrong.
-			list($width, $height, $type, $attr) = getimagesize($filename);
+			list($width, $height, $type, $attr) = @getimagesize($filename);
 			switch($type) {
 				case 1: if(function_exists('imagecreatefromgif')) $this->setGD(imagecreatefromgif($filename)); break;
 				case 2: if(function_exists('imagecreatefromjpeg')) $this->setGD(imagecreatefromjpeg($filename)); break;

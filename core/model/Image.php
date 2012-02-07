@@ -381,8 +381,11 @@ class Image extends File {
 	function getDimensions($dim = "string") {
 		if($this->getField('Filename')) {
 			$imagefile = Director::baseFolder() . '/' . $this->getField('Filename');
-			if(file_exists($imagefile)) {
-				$size = getimagesize($imagefile);
+			if(is_readable($imagefile)) {
+				$size = @getimagesize($imagefile);
+				if (!is_array($size)) {
+					return ($dim === "string") ? "file '$imagefile' not found" : null;
+				}
 				return ($dim === "string") ? "$size[0]x$size[1]" : $size[$dim];
 			} else {
 				return ($dim === "string") ? "file '$imagefile' not found" : null;
