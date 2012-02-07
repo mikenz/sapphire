@@ -1012,7 +1012,7 @@ function column_sort_callback_basic($a, $b) {
 	if($a->$column_sort_field == $b->$column_sort_field) {
 		$result  = 0;
 	} else {
-		$result = ($a->$column_sort_field < $b->$column_sort_field) ? -1 * $column_sort_multiplier : 1 * $column_sort_multiplier;
+		$result = (strtolower($a->$column_sort_field) < strtolower($b->$column_sort_field)) ? -1 * $column_sort_multiplier : 1 * $column_sort_multiplier;
 	}
 	
 	return $result;
