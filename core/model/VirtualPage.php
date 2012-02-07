@@ -66,7 +66,11 @@ class VirtualPage extends Page {
 	 */
 	function CopyContentFrom() {
 		if(empty($this->record['CopyContentFromID'])) return new SiteTree();
-		
+
+		if(isset($this->components['CopyContentFrom']) && $this->components['CopyContentFrom'] instanceof DataObject && $this->components['CopyContentFrom']->destroyed) {
+			unset($this->components['CopyContentFrom']);
+		}
+
 		if(!isset($this->components['CopyContentFrom'])) {
 			$this->components['CopyContentFrom'] = DataObject::get_by_id("SiteTree", 
 				$this->record['CopyContentFromID']);
