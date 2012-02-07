@@ -6,6 +6,7 @@
  */
 class Cookie {
 	static $report_errors = true;
+	static $hasBeenSet = array();
 	
 	/**
 	 * Set a cookie variable
@@ -19,15 +20,21 @@ class Cookie {
 	 * @param boolean $httpOnly See http://php.net/set_session (PHP 5.2+ only)
 	 */
 	static function set($name, $value, $expiryDays = 90, $path = null, $domain = null, $secure = false, $httpOnly = false) {
+		$value = is_null($value) ? '' : $value;
 		if(!headers_sent($file, $line)) {
 			$expiry = $expiryDays > 0 ? time()+(86400*$expiryDays) : 0;
 			$path = ($path) ? $path : Director::baseURL();
 
-			// Versions of PHP prior to 5.2 do not support the $httpOnly value
-			if(version_compare(phpversion(), 5.2, '<')) {
-				setcookie($name, $value, $expiry, $path, $domain, $secure);
-			} else {
-				setcookie($name, $value, $expiry, $path, $domain, $secure, $httpOnly);
+			if (!isset(self::$hasBeenSet[$name]) || self::$hasBeenSet[$name] != $value) {
+				if (!isset($_COOKIE[$name]) || $_COOKIE[$name] != $value) {
+					// Versions of PHP prior to 5.2 do not support the $httpOnly value
+					if(version_compare(phpversion(), 5.2, '<')) {
+						setcookie($name, $value, $expiry, $path, $domain, $secure);
+					} else {
+						setcookie($name, $value, $expiry, $path, $domain, $secure, $httpOnly);
+					}
+					self::$hasBeenSet[$name] = $value;
+				}
 			}
 		} else {
 			if(self::$report_errors) user_error("Cookie '$name' can't be set. The site started outputting was content at line $line in $file", E_USER_WARNING);
