@@ -322,9 +322,11 @@ class TreeDropdownField_Readonly extends TreeDropdownField {
 	
 	function Field() {
 		$fieldName = $this->labelField;
-		if($this->value) {
+		if($this->value && is_numeric($this->value)) {
 			$keyObj = $this->objectForKey($this->value);
 			$obj = $keyObj ? $keyObj->$fieldName : '';
+		} elseif ($this->value) {
+			return $this->value;
 		} else {
 			$obj = null;
 		}
