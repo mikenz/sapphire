@@ -57,6 +57,13 @@ class SS_Datetime extends Date {
 		return date('H:i', strtotime($this->value));
 	}
 
+	/**
+	 * Returns the date in the format 24 Dec 2006 23:45
+	 */
+	function Full() {
+		return parent::Full() . ', ' . $this->Time24();
+	}
+
 	function requireField() {
 		$parts=Array('datatype'=>'datetime', 'arrayValue'=>$this->arrayValue);
 		$values=Array('type'=>'SS_Datetime', 'parts'=>$parts);
