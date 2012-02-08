@@ -477,7 +477,6 @@ $lang['pl_PL']['SecurityAdmin']['PERMISSIONS'] = 'Zezwolenia';
 $lang['pl_PL']['SecurityAdmin']['ROLES'] = 'Role';
 $lang['pl_PL']['SecurityAdmin']['ROLESDESCRIPTION'] = 'Sekcja umożliwia dodanie ról do grupy. Role są logicznie uporządkowanymi uprawnieniami, które można edytować w zakładce Role';
 $lang['pl_PL']['SecurityAdmin']['VIEWUSER'] = 'Zobacz Użytkownika';
-$lang['pl_PL']['SilverStripeNavigatorLink']['ShareLink'] = 'Podziel się linkiem';
 $lang['pl_PL']['SilverStripeNavigatorLinkl']['CloseLink'] = 'Zamknij';
 $lang['pl_PL']['SimpleImageField']['NOUPLOAD'] = 'Nie wgrano zdjęć';
 $lang['pl_PL']['SiteConfig']['DEFAULTTHEME'] = '(Użyj domyślnego szablonu)';

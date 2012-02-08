@@ -509,7 +509,6 @@ $lang['da_DK']['SecurityAdmin']['PERMISSIONS'] = 'Tilladelser';
 $lang['da_DK']['SecurityAdmin']['ROLES'] = 'Roller';
 $lang['da_DK']['SecurityAdmin']['ROLESDESCRIPTION'] = 'Dette afsnit giver dig mulighed for at tilføje funktioner til denne gruppe. Roller er logiske grupperinger af tilladelser, som kan redigeres i';
 $lang['da_DK']['SecurityAdmin']['VIEWUSER'] = 'Vis bruger';
-$lang['da_DK']['SilverStripeNavigatorLink']['ShareLink'] = 'Del link';
 $lang['da_DK']['SilverStripeNavigatorLinkl']['CloseLink'] = 'Luk';
 $lang['da_DK']['SimpleImageField']['NOUPLOAD'] = 'Intet billede uploadet';
 $lang['da_DK']['SiteConfig']['DEFAULTTHEME'] = '(Brug standard tema)';
