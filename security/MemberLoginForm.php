@@ -77,7 +77,7 @@ class MemberLoginForm extends LoginForm {
 					new FormAction('dologin', _t('Member.BUTTONLOGIN', "Log in")),
 					new LiteralField(
 						'forgotPassword',
-						'<p id="ForgotPassword"><a href="Security/lostpassword">' . _t('Member.BUTTONLOSTPASSWORD', "I've lost my password") . '</a></p>'
+						'<p id="ForgotPassword"><a href="/Security/lostpassword">' . _t('Member.BUTTONLOSTPASSWORD', "I've lost my password") . '</a></p>'
 					)
 				);
 			}
@@ -238,20 +238,18 @@ JS
 				)
 			);
 
-			Director::redirect('Security/passwordsent/' . urlencode($data['Email']));
+			Director::redirect('/Security/passwordsent/' . urlencode($data['Email']));
 		} elseif($data['Email']) {
 			// Avoid information disclosure by displaying the same status,
 			// regardless wether the email address actually exists
-			Director::redirect('Security/passwordsent/' . urlencode($data['Email']));
+			Director::redirect('/Security/passwordsent/' . urlencode($data['Email']));
 		} else {
 			$this->sessionMessage(
 				_t('Member.ENTEREMAIL', 'Please enter an email address to get a password reset link.'),
 				'bad'
 			);
 			
-			Director::redirect('Security/lostpassword');
+			Director::redirect('/Security/lostpassword');
 		}
 	}
-
 }
-?>
