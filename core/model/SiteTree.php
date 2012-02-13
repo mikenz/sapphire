@@ -1534,8 +1534,9 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 			if(class_exists($this->URLSegment) && is_subclass_of($this->URLSegment, 'RequestHandler')) return false;
 		}
 		
-		$IDFilter     = ($this->ID) ? "AND \"SiteTree\".\"ID\" <> $this->ID" :  null;
-		$parentFilter = null;
+		$IDFilter      = ($this->ID) ? "AND \"SiteTree\".\"ID\" <> $this->ID" :  null;
+		$subsiteFilter = (class_exists('Subsite')) ? " AND \"SiteTree\".\"SubsiteID\" = $this->SubsiteID" :  null;
+		$parentFilter  = null;
 		
 		if(self::nested_urls()) {
 			if($this->ParentID) {
@@ -1547,7 +1548,7 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 		
 		$existingPage = DataObject::get_one(
 			'SiteTree', 
-			"\"URLSegment\" = '$this->URLSegment' $IDFilter $parentFilter"
+			"\"URLSegment\" = '$this->URLSegment' $IDFilter $parentFilter $subsiteFilter"
 		);
 		if ($existingPage) {
 			return false;
