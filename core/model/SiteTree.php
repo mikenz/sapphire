@@ -570,6 +570,15 @@ class SiteTree extends DataObject implements PermissionProvider,i18nEntityProvid
 		if($doWrite) {
 			$page->write();
 		}
+
+		foreach ($this->ViewerGroups() as $group) {
+			$page->ViewerGroups()->add($group);
+		}
+
+		foreach ($this->EditorGroups() as $group) {
+			$page->EditorGroups()->add($group);
+		}
+
 		$this->extend('onAfterDuplicate', $page);
 		
 		return $page;
