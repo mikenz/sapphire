@@ -50,7 +50,7 @@ class SS_LogFileWriter extends Zend_Log_Writer_Abstract {
 		$this->extraHeaders = $extraHeaders;
 
 		// Create log file if necessary
-		if($this->path && !file_exists($this->path)) {
+		if($this->path && !file_exists($this->path) && strpos($this->path, 'php:') !== 0) {
 			if(!touch($this->path)) {
 				throw new InvalidArgumentException(sprintf('Path "%s" could not be created', $this->path));
 			}
