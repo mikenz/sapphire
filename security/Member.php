@@ -38,11 +38,11 @@ class Member extends DataObject {
 	);
 
 	static $has_one = array();
-	
+
 	static $has_many = array();
-	
+
 	static $many_many = array();
-	
+
 	static $many_many_extraFields = array();
 
 	static $default_sort = '"Surname", "FirstName"';
@@ -53,7 +53,7 @@ class Member extends DataObject {
 	);
 
 	static $notify_password_change = false;
-	
+
 	/**
 	 * All searchable database columns
 	 * in this object, currently queried
@@ -70,32 +70,32 @@ class Member extends DataObject {
 		'Surname',
 		'Email',
 	);
-	
+
 	static $summary_fields = array(
 		'FirstName' => 'First Name',
 		'Surname' => 'Last Name',
 		'Email' => 'Email',
 	);
-	
+
 	/**
 	 * @var Array See {@link set_title_columns()}
 	 */
 	static $title_format = null;
-	
+
 	/**
 	 * The unique field used to identify this member.
 	 * By default, it's "Email", but another common
 	 * field could be Username.
-	 * 
+	 *
 	 * @var string
 	 */
 	protected static $unique_identifier_field = 'Email';
-	
+
 	/**
 	 * {@link PasswordValidator} object for validating user's password
 	 */
 	protected static $password_validator = null;
-	
+
 	/**
 	 * The number of days that a password should be valid for.
 	 * By default, this is null, which means that passwords never expire
@@ -103,7 +103,7 @@ class Member extends DataObject {
 	protected static $password_expiry_days = null;
 
 	protected static $lock_out_after_incorrect_logins = null;
-	
+
 	/**
 	 * If this is set, then a session cookie with the given name will be set on log-in,
 	 * and cleared on logout.
@@ -113,10 +113,10 @@ class Member extends DataObject {
 	/**
 	 * Indicates that when a {@link Member} logs in, Member:session_regenerate_id()
 	 * should be called as a security precaution.
-	 * 
+	 *
 	 * This doesn't always work, especially if you're trying to set session cookies
 	 * across an entire site using the domain parameter to session_set_cookie_params()
-	 * 
+	 *
 	 * @var boolean
 	 */
 	protected static $session_regenerate_id = true;
@@ -132,10 +132,10 @@ class Member extends DataObject {
 		parent::populateDefaults();
 		$this->Locale = i18n::get_locale();
 	}
-	
+
 	function requireDefaultRecords() {
 		// Default groups should've been built by Group->requireDefaultRecords() already
-		
+
 		// Find or create ADMIN group
 		$adminGroups = Permission::get_groups_by_permission('ADMIN');
 		if(!$adminGroups) {
@@ -143,7 +143,7 @@ class Member extends DataObject {
 			$adminGroups = Permission::get_groups_by_permission('ADMIN');
 		}
 		$adminGroup = $adminGroups->First();
-		
+
 		// Add a default administrator to the first ADMIN group found (most likely the default
 		// group created through Group->requireDefaultRecords()).
 		$admins = Permission::get_members_by_permission('ADMIN');
@@ -154,31 +154,31 @@ class Member extends DataObject {
 			$admin->FirstName = _t('Member.DefaultAdminFirstname', 'Default Admin');
 			$admin->write();
 			$admin->Groups()->add($adminGroup);
-		}		
+		}
 	}
 
 	/**
 	 * If this is called, then a session cookie will be set to "1" whenever a user
 	 * logs in.  This lets 3rd party tools, such as apache's mod_rewrite, detect
 	 * whether a user is logged in or not and alter behaviour accordingly.
-	 * 
+	 *
 	 * One known use of this is to bypass static caching for logged in users.  This is
 	 * done by putting this into _config.php
 	 * <pre>
 	 * Member::set_login_marker_cookie("SS_LOGGED_IN");
 	 * </pre>
-	 * 
+	 *
 	 * And then adding this condition to each of the rewrite rules that make use of
 	 * the static cache.
 	 * <pre>
 	 * RewriteCond %{HTTP_COOKIE} !SS_LOGGED_IN=1
 	 * </pre>
-	 * 
+	 *
 	 * @param $cookieName string The name of the cookie to set.
 	 */
 	static function set_login_marker_cookie($cookieName) {
 		self::$login_marker_cookie = $cookieName;
-	} 
+	}
 
 	/**
 	 * Check if the passed password matches the stored one (if the member is not locked out).
@@ -190,8 +190,8 @@ class Member extends DataObject {
 		$result = $this->canLogIn();
 
 		$spec = Security::encrypt_password(
-			$password, 
-			$this->Salt, 
+			$password,
+			$this->Salt,
 			$this->PasswordEncryption,
 			$this
 		);
@@ -239,7 +239,7 @@ class Member extends DataObject {
 
 	/**
 	 * Regenerate the session_id.
-	 * This wrapper is here to make it easier to disable calls to session_regenerate_id(), should you need to.  
+	 * This wrapper is here to make it easier to disable calls to session_regenerate_id(), should you need to.
 	 * They have caused problems in certain
 	 * quirky problems (such as using the Windmill 0.3.6 proxy).
 	 */
@@ -248,42 +248,42 @@ class Member extends DataObject {
 
 		// This can be called via CLI during testing.
 		if(Director::is_cli()) return;
-		
+
 		$file = '';
 		$line = '';
-		
+
 		// @ is to supress win32 warnings/notices when session wasn't cleaned up properly
 		// There's nothing we can do about this, because it's an operating system function!
 		if(!headers_sent($file, $line)) @session_regenerate_id(true);
 	}
-	
+
 	/**
 	 * Get the field used for uniquely identifying a member
 	 * in the database. {@see Member::$unique_identifier_field}
-	 * 
+	 *
 	 * @return string
 	 */
 	static function get_unique_identifier_field() {
 		return self::$unique_identifier_field;
 	}
-	
+
 	/**
 	 * Set the field used for uniquely identifying a member
 	 * in the database. {@see Member::$unique_identifier_field}
-	 * 
+	 *
 	 * @param $field The field name to set as the unique field
 	 */
 	static function set_unique_identifier_field($field) {
 		self::$unique_identifier_field = $field;
 	}
-	
+
 	/**
 	 * Set a {@link PasswordValidator} object to use to validate member's passwords.
 	 */
 	static function set_password_validator($pv) {
 		self::$password_validator = $pv;
 	}
-	
+
 	/**
 	 * Returns the current {@link PasswordValidator}
 	 */
@@ -298,15 +298,15 @@ class Member extends DataObject {
 	static function set_password_expiry($days) {
 		self::$password_expiry_days = $days;
 	}
-	
+
 	/**
 	 * Configure the security system to lock users out after this many incorrect logins
 	 */
 	static function lock_out_after_incorrect_logins($numLogins) {
 		self::$lock_out_after_incorrect_logins = $numLogins;
 	}
-	
-	
+
+
 	function isPasswordExpired() {
 		if(!$this->PasswordExpiry) return false;
 		return strtotime(date('Y-m-d')) >= strtotime($this->PasswordExpiry);
@@ -338,19 +338,19 @@ class Member extends DataObject {
 			Cookie::set('alc_enc', null);
 			Cookie::forceExpiry('alc_enc');
 		}
-		
+
 		// Clear the incorrect log-in count
 		if(self::$lock_out_after_incorrect_logins) {
 			$this->FailedLoginCount = 0;
 		}
-		
+
 		// Don't set column if its not built yet (the login might be precursor to a /dev/build...)
 		if(array_key_exists('LockedOutUntil', DB::fieldList('Member'))) {
 			$this->LockedOutUntil = null;
 		}
 
 		$this->write();
-		
+
 		// Audit logging hook
 		$this->extend('memberLoggedIn');
 	}
@@ -359,7 +359,7 @@ class Member extends DataObject {
 	 * Check if the member ID logged in session actually
 	 * has a database record of the same ID. If there is
 	 * no logged in user, FALSE is returned anyway.
-	 * 
+	 *
 	 * @return boolean TRUE record found FALSE no record found
 	 */
 	static function logged_in_session_exists() {
@@ -368,10 +368,10 @@ class Member extends DataObject {
 				if($member->exists()) return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Log the user in if the "remember login" cookie is set
 	 *
@@ -381,7 +381,7 @@ class Member extends DataObject {
 	static function autoLogin() {
 		// Don't bother trying this multiple times
 		self::$_already_tried_to_auto_log_in = true;
-		
+
 		if(strpos(Cookie::get('alc_enc'), ':') && !Session::get("loggedInAs")) {
 			list($uid, $token) = explode(':', Cookie::get('alc_enc'), 2);
 			$SQL_uid = Convert::raw2sql($uid);
@@ -399,7 +399,7 @@ class Member extends DataObject {
 				Session::set("loggedInAs", $member->ID);
 				// This lets apache rules detect whether the user has logged in
 				if(self::$login_marker_cookie) Cookie::set(self::$login_marker_cookie, 1, 0, null, null, false, true);
-				
+
 				$generator = new RandomGenerator();
 				$token = $generator->randomToken('sha1');
 				$hash = $member->encryptWithUserSettings($token);
@@ -408,7 +408,7 @@ class Member extends DataObject {
 
 				$member->NumVisit++;
 				$member->write();
-				
+
 				// Audit logging hook
 				$member->extend('memberAutoLoggedIn');
 			}
@@ -430,7 +430,7 @@ class Member extends DataObject {
 		Cookie::forceExpiry('alc_enc');
 
 		$this->write();
-		
+
 		// Audit logging hook
 		$this->extend('memberLoggedOut');
 	}
@@ -554,7 +554,7 @@ class Member extends DataObject {
 
 	/**
 	 * Returns the fields for the member form - used in the registration/profile module.
-	 * It should return fields that are editable by the admin and the logged-in user. 
+	 * It should return fields that are editable by the admin and the logged-in user.
 	 *
 	 * @return FieldSet Returns a {@link FieldSet} containing the fields for
 	 *                  the member form.
@@ -648,10 +648,10 @@ class Member extends DataObject {
 
 			return $word . $number;
 		} else {
-	    	$random = rand();
-		    $string = md5($random);
-    		$output = substr($string, 0, 6);
-	    	return $output;
+			$random = rand();
+			$string = md5($random);
+			$output = substr($string, 0, 6);
+			return $output;
 		}
 	}
 
@@ -662,14 +662,14 @@ class Member extends DataObject {
 		if($this->SetPassword) $this->Password = $this->SetPassword;
 
 		// If a member with the same "unique identifier" already exists with a different ID, don't allow merging.
-		// Note: This does not a full replacement for safeguards in the controller layer (e.g. in a registration form), 
+		// Note: This does not a full replacement for safeguards in the controller layer (e.g. in a registration form),
 		// but rather a last line of defense against data inconsistencies.
 		$identifierField = self::$unique_identifier_field;
 		if($this->$identifierField) {
 			// Note: Same logic as Member_Validator class
 			$idClause = ($this->ID) ? sprintf(" AND \"Member\".\"ID\" <> %d", (int)$this->ID) : '';
 			$existingRecord = DataObject::get_one(
-				'Member', 
+				'Member',
 				sprintf(
 					"\"%s\" = '%s' %s",
 					$identifierField,
@@ -680,8 +680,8 @@ class Member extends DataObject {
 			if($existingRecord) {
 				throw new ValidationException(new ValidationResult(false, sprintf(
 					_t(
-						'Member.ValidationIdentifierFailed', 
-						'Can\'t overwrite existing member #%d with identical identifier (%s = %s))', 
+						'Member.ValidationIdentifierFailed',
+						'Can\'t overwrite existing member #%d with identical identifier (%s = %s))',
 						PR_MEDIUM,
 						'The values in brackets show a fieldname mapped to a value, usually denoting an existing email address'
 					),
@@ -695,9 +695,9 @@ class Member extends DataObject {
 		// We don't send emails out on dev/tests sites to prevent accidentally spamming users.
 		// However, if TestMailer is in use this isn't a risk.
 		if(
-			(Director::isLive() || Email::mailer() instanceof TestMailer) 
+			(Director::isLive() || Email::mailer() instanceof TestMailer)
 			&& $this->isChanged('Password')
-			&& $this->record['Password'] 
+			&& $this->record['Password']
 			&& Member::$notify_password_change
 		) {
 			$this->sendInfo('changePassword');
@@ -735,10 +735,10 @@ class Member extends DataObject {
 		if(!$this->Locale) {
 			$this->Locale = i18n::get_locale();
 		}
-		
+
 		parent::onBeforeWrite();
 	}
-	
+
 	function onAfterWrite() {
 		parent::onAfterWrite();
 
@@ -746,15 +746,15 @@ class Member extends DataObject {
 			MemberPassword::log($this);
 		}
 	}
-	
+
 	/**
 	 * If any admin groups are requested, deny the whole save operation.
-	 * 
+	 *
 	 * @param Array $ids Database IDs of Group records
 	 * @return boolean
 	 */
 	function onChangeGroups($ids) {
-		// Filter out admin groups to avoid privilege escalation, 
+		// Filter out admin groups to avoid privilege escalation,
 		// unless the current user is an admin already
 		if(!Permission::checkMember($this, 'ADMIN')) {
 			$adminGroups = Permission::get_groups_by_permission('ADMIN');
@@ -777,7 +777,7 @@ class Member extends DataObject {
 		if($groups) foreach($groups as $group) {
 			if($this->inGroup($group, $strict)) return true;
 		}
-		
+
 		return false;
 	}
 
@@ -800,9 +800,9 @@ class Member extends DataObject {
 		} else {
 			user_error('Member::inGroup(): Wrong format for $group parameter', E_USER_ERROR);
 		}
-		
+
 		if(!$groupCheckObj) return false;
-		
+
 		$groupCandidateObjs = ($strict) ? $this->getManyManyComponents("Groups") : $this->Groups();
 		if($groupCandidateObjs) foreach($groupCandidateObjs as $groupCandidateObj) {
 			if($groupCandidateObj->ID == $groupCheckObj->ID) return true;
@@ -810,43 +810,43 @@ class Member extends DataObject {
 
 		return false;
 	}
-	
+
 	/**
-	 * Adds the member to a group. This will create the group if the given 
-	 * group code does not return a valid group object. 
+	 * Adds the member to a group. This will create the group if the given
+	 * group code does not return a valid group object.
 	 *
 	 * @param string $groupcode
 	 * @param string Title of the group
 	 */
 	public function addToGroupByCode($groupcode, $title = "") {
 		$group = DataObject::get_one('Group', "\"Code\" = '" . Convert::raw2sql($groupcode). "'");
-		
+
 		if($group) {
 			$this->Groups()->add($group);
 		}
 		else {
 			if(!$title) $title = $groupcode;
-			
+
 			$group = new Group();
 			$group->Code = $groupcode;
 			$group->Title = $title;
 			$group->write();
-			
+
 			$this->Groups()->add($group);
 		}
 	}
-	
+
 	/**
 	 * Returns true if this user is an administrator.
 	 * Administrators have access to everything.
-	 * 
+	 *
 	 * @deprecated Use Permission::check('ADMIN') instead
 	 * @return Returns TRUE if this user is an administrator.
 	 */
 	function isAdmin() {
 		return Permission::checkMember($this, 'ADMIN');
 	}
-	
+
 	/**
 	 * @param Array $columns Column names on the Member record to show in {@link getTitle()}.
 	 * @param String $sep Separator
@@ -861,7 +861,7 @@ class Member extends DataObject {
 	/**
 	 * Get the complete name of the member, by default in the format "<Surname>, <FirstName>".
 	 * Falls back to showing either field on its own.
-	 * 
+	 *
 	 * You can overload this getter with {@link set_title_format()}
 	 * and {@link set_title_sql()}.
 	 *
@@ -894,7 +894,7 @@ class Member extends DataObject {
 	/**
 	 * Return a SQL CONCAT() fragment suitable for a SELECT statement.
 	 * Useful for custom queries which assume a certain member title format.
-	 * 
+	 *
 	 * @param String $tableName
 	 * @return String SQL
 	 */
@@ -907,7 +907,7 @@ class Member extends DataObject {
 			foreach(self::$title_format['columns'] as $column) {
 				$columnsWithTablename[] = "\"$tableName\".\"$column\"";
 			}
-		
+
 			return "(".join(" $op '".self::$title_format['sep']."' $op ", $columnsWithTablename).")";
 		} else {
 			return "(\"$tableName\".\"Surname\" $op ' ' $op \"$tableName\".\"FirstName\")";
@@ -954,7 +954,7 @@ class Member extends DataObject {
 	 * Override the default getter for DateFormat so the
 	 * default format for the user's locale is used
 	 * if the user has not defined their own.
-	 * 
+	 *
 	 * @return string ISO date format
 	 */
 	public function getDateFormat() {
@@ -972,7 +972,7 @@ class Member extends DataObject {
 	 * Override the default getter for TimeFormat so the
 	 * default format for the user's locale is used
 	 * if the user has not defined their own.
-	 * 
+	 *
 	 * @return string ISO date format
 	 */
 	public function getTimeFormat() {
@@ -1014,7 +1014,7 @@ class Member extends DataObject {
 
 			$unfilteredGroups = singleton('Group')->instance_get("\"Group\".\"ID\" IN ($collatedGroups)", "\"Group\".\"ID\"", "", "", "Member_GroupSet");
 			$result = new ComponentSet();
-			
+
 			// Only include groups where allowedIPAddress() returns true
 			$ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null;
 			foreach($unfilteredGroups as $group) {
@@ -1102,15 +1102,15 @@ class Member extends DataObject {
 	public static function mapInCMSGroups($groups = null) {
 		if(!$groups || $groups->Count() == 0) {
 			$perms = array('ADMIN', 'CMS_ACCESS_AssetAdmin');
-			
+
 			$cmsPerms = singleton('CMSMain')->providePermissions();
-			
+
 			if(!empty($cmsPerms)) {
 				$perms = array_unique(array_merge($perms, array_keys($cmsPerms)));
 			}
-			
+
 			$SQL_perms = "'" . implode("', '", Convert::raw2sql($perms)) . "'";
-			
+
 			$groups = DataObject::get('Group', "", "",
 				"INNER JOIN \"Permission\" ON \"Permission\".\"GroupID\" = \"Group\".\"ID\" AND \"Permission\".\"Code\" IN ($SQL_perms)");
 		}
@@ -1155,7 +1155,7 @@ class Member extends DataObject {
 				unset($groupList[$index]);
 			}
 		}
-		
+
 		return $groupList;
 	}
 
@@ -1169,38 +1169,38 @@ class Member extends DataObject {
 	 */
 	public function getCMSFields() {
 		require_once('Zend/Date.php');
-		
+
 		$fields = parent::getCMSFields();
 
 		$mainFields = $fields->fieldByName("Root")->fieldByName("Main")->Children;
 
 		$password = new ConfirmedPasswordField(
-			'Password', 
-			null, 
-			null, 
-			null, 
+			'Password',
+			null,
+			null,
+			null,
 			true // showOnClick
 		);
 		$password->setCanBeEmpty(true);
 		if(!$this->ID) $password->showOnClick = false;
 		$mainFields->replaceField('Password', $password);
-		
+
 		$mainFields->insertBefore(
 			new HeaderField('MemberDetailsHeader',_t('Member.PERSONALDETAILS', "Personal Details", PR_MEDIUM, 'Headline for formfields')),
 			'FirstName'
 		);
-		
+
 		$mainFields->insertBefore(
 			new HeaderField('MemberUserDetailsHeader',_t('Member.USERDETAILS', "User Details", PR_MEDIUM, 'Headline for formfields')),
 			'Email'
 		);
-		
+
 		$mainFields->replaceField('Locale', new DropdownField(
-			"Locale", 
-			_t('Member.INTERFACELANG', "Interface Language", PR_MEDIUM, 'Language of the CMS'), 
+			"Locale",
+			_t('Member.INTERFACELANG', "Interface Language", PR_MEDIUM, 'Language of the CMS'),
 			i18n::get_existing_translations()
 		));
-		
+
 		$mainFields->removeByName('Bounced');
 		$mainFields->removeByName('RememberLoginToken');
 		$mainFields->removeByName('AutoLoginHash');
@@ -1208,26 +1208,26 @@ class Member extends DataObject {
 		$mainFields->removeByName('PasswordEncryption');
 		$mainFields->removeByName('PasswordExpiry');
 		$mainFields->removeByName('LockedOutUntil');
-		
+
 		if(!self::$lock_out_after_incorrect_logins) {
 			$mainFields->removeByName('FailedLoginCount');
 		}
-		
+
 		$mainFields->removeByName('Salt');
 		$mainFields->removeByName('NumVisit');
 		$mainFields->removeByName('LastVisited');
-	
+
 		$fields->removeByName('Subscriptions');
 
 		// Groups relation will get us into logical conflicts because
 		// Members are displayed within  group edit form in SecurityAdmin
 		$fields->removeByName('Groups');
-		
+
 		if(Permission::check('EDIT_PERMISSIONS')) {
 			$groupsField = new TreeMultiselectField('Groups', false, 'Group');
 			$fields->findOrMakeTab('Root.Groups', singleton('Group')->i18n_plural_name());
 			$fields->addFieldToTab('Root.Groups', $groupsField);
-			
+
 			// Add permission field (readonly to avoid complicated group assignment logic).
 			// This should only be available for existing records, as new records start
 			// with no permissions until they have a group assignment anyway.
@@ -1244,7 +1244,7 @@ class Member extends DataObject {
 				$fields->addFieldToTab('Root.Permissions', $permissionsField);
 			}
 		}
-		
+
 		$defaultDateFormat = Zend_Locale_Format::getDateFormat($this->Locale);
 		$dateFormatMap = array(
 			'MMM d, yyyy' => Zend_Date::now()->toString('MMM d, yyyy'),
@@ -1262,7 +1262,7 @@ class Member extends DataObject {
 			)
 		);
 		$dateFormatField->setValue($this->DateFormat);
-		
+
 		$defaultTimeFormat = Zend_Locale_Format::getTimeFormat($this->Locale);
 		$timeFormatMap = array(
 			'h:mm a' => Zend_Date::now()->toString('h:mm a'),
@@ -1278,20 +1278,20 @@ class Member extends DataObject {
 			)
 		);
 		$timeFormatField->setValue($this->TimeFormat);
-		
+
 		$this->extend('updateCMSFields', $fields);
-		
+
 		return $fields;
 	}
-	
+
 	/**
 	 *
 	 * @param boolean $includerelations a boolean value to indicate if the labels returned include relation fields
-	 * 
+	 *
 	 */
 	function fieldLabels($includerelations = true) {
 		$labels = parent::fieldLabels($includerelations);
-		
+
 		$labels['FirstName'] = _t('Member.FIRSTNAME', 'First Name');
 		$labels['Surname'] = _t('Member.SURNAME', 'Surname');
 		$labels['Email'] = _t('Member.EMAIL', 'Email');
@@ -1306,7 +1306,7 @@ class Member extends DataObject {
 		}
 		return $labels;
 	}
-	
+
 	/**
 	 * Users can view their own record.
 	 * Otherwise they'll need ADMIN or CMS_ACCESS_SecurityAdmin permissions.
@@ -1314,81 +1314,95 @@ class Member extends DataObject {
 	 */
 	function canView($member = null) {
 		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) $member = Member::currentUser();
-		
+
 		// decorated access checks
 		$results = $this->extend('canView', $member);
 		if($results && is_array($results)) {
 			if(!min($results)) return false;
 			else return true;
 		}
-		
+
 		// members can usually edit their own record
 		if($member && $this->ID == $member->ID) return true;
-		
+
 		if(
 			Permission::checkMember($member, 'ADMIN')
 			|| Permission::checkMember($member, 'CMS_ACCESS_SecurityAdmin')
 		) {
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Users can edit their own record.
 	 * Otherwise they'll need ADMIN or CMS_ACCESS_SecurityAdmin permissions
 	 */
 	function canEdit($member = null) {
 		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) $member = Member::currentUser();
-		
+
 		// decorated access checks
 		$results = $this->extend('canEdit', $member);
 		if($results && is_array($results)) {
 			if(!min($results)) return false;
 			else return true;
 		}
-		
+
 		// No member found
 		if(!($member && $member->exists())) return false;
-		
+
 		// If the requesting member is not an admin, but has access to manage members,
 		// he still can't edit other members with ADMIN permission.
 		// This is a bit weak, strictly speaking he shouldn't be allowed to
 		// perform any action that could change the password on a member
-		// with "higher" permissions than himself, but thats hard to determine.		
+		// with "higher" permissions than himself, but thats hard to determine.
 		if(!Permission::checkMember($member, 'ADMIN') && Permission::checkMember($this, 'ADMIN')) return false;
 
 		return $this->canView($member);
 	}
-	
+
 	/**
 	 * Users can edit their own record.
 	 * Otherwise they'll need ADMIN or CMS_ACCESS_SecurityAdmin permissions
 	 */
 	function canDelete($member = null) {
 		if(!$member || !(is_a($member, 'Member')) || is_numeric($member)) $member = Member::currentUser();
-		
+
 		// decorated access checks
 		$results = $this->extend('canDelete', $member);
 		if($results && is_array($results)) {
 			if(!min($results)) return false;
 			else return true;
 		}
-		
+
 		// No member found
 		if(!($member && $member->exists())) return false;
-		
+
 		return $this->canEdit($member);
 	}
 
+
+	/**
+	 * Remeber the details of a member when they are deleted
+	 */
+	public function onBeforeDelete() {
+		$deleted = new DeletedMember();
+		$original = $this->owner->toMap();
+		unset($original['ClassName']);
+		foreach ($original as $k => $v) {
+			$deleted->$k = $v;
+		}
+		$deleted->write();
+		parent::onBeforeDelete();
+	}
 
 	/**
 	 * Validate this member object.
 	 */
 	function validate() {
 		$valid = parent::validate();
-		
+
 		if(!$this->ID || $this->isChanged('Password')) {
 			if($this->Password && self::$password_validator) {
 				$valid->combineAnd(self::$password_validator->validate($this->Password, $this));
@@ -1402,26 +1416,26 @@ class Member extends DataObject {
 		}
 
 		return $valid;
-	}	
-	
+	}
+
 	/**
 	 * Change password. This will cause rehashing according to
 	 * the `PasswordEncryption` property.
-	 * 
+	 *
 	 * @param String $password Cleartext password
 	 */
 	function changePassword($password) {
 		$this->Password = $password;
 		$valid = $this->validate();
-		
+
 		if($valid->valid()) {
 			$this->AutoLoginHash = null;
 			$this->write();
 		}
-		
+
 		return $valid;
 	}
-	
+
 	/**
 	 * Tell this member that someone made a failed attempt at logging in as them.
 	 * This can be used to lock the user out temporarily if too many failed attempts are made.
@@ -1431,25 +1445,25 @@ class Member extends DataObject {
 			// Keep a tally of the number of failed log-ins so that we can lock people out
 			$this->FailedLoginCount = $this->FailedLoginCount + 1;
 			$this->write();
-	
+
 			if($this->FailedLoginCount >= self::$lock_out_after_incorrect_logins) {
 				$this->LockedOutUntil = date('Y-m-d H:i:s', time() + 15*60);
 				$this->write();
 			}
 		}
 	}
-	
+
 	/**
 	 * Get the HtmlEditorConfig for this user to be used in the CMS.
 	 * This is set by the group. If multiple configurations are set,
 	 * the one with the highest priority wins.
-	 * 
+	 *
 	 * @return string
 	 */
 	function getHtmlEditorConfigForCMS() {
 		$currentName = '';
 		$currentPriority = 0;
-		
+
 		foreach($this->Groups() as $group) {
 			$configName = $group->HtmlEditorConfig;
 			if($configName) {
@@ -1459,7 +1473,7 @@ class Member extends DataObject {
 				}
 			}
 		}
-		
+
 		// If can't find a suitable editor, just default to cms
 		return $currentName ? $currentName : 'cms';
 	}
@@ -1587,8 +1601,8 @@ class Member_GroupSet extends ComponentSet {
 	 * @param array $ids Group identifiers.
 	 */
 	function removeManyByGroupID($groupIds) {
-	 	$groups = $this->getGroupsFromIDs($groupIds);
-	 	if($groups) {
+		$groups = $this->getGroupsFromIDs($groupIds);
+		if($groups) {
 			foreach($groups as $group) {
 				$this->remove($group);
 			}
@@ -1680,7 +1694,7 @@ class Member_GroupSet extends ComponentSet {
  * @subpackage security
  */
 class Member_ProfileForm extends Form {
-	
+
 	function __construct($controller, $name, $member) {
 		Requirements::clear();
 		Requirements::css(CMS_DIR . '/css/typography.css');
@@ -1692,47 +1706,47 @@ class Member_ProfileForm extends Form {
 		Requirements::javascript(THIRDPARTY_DIR . "/scriptaculous/controls.js");
 		Requirements::javascript(SAPPHIRE_DIR . "/javascript/layout_helpers.js");
 		Requirements::css(SAPPHIRE_DIR . "/css/Form.css");
-		
+
 		Requirements::css(SAPPHIRE_DIR . "/css/MemberProfileForm.css");
-		
-		
+
+
 		$fields = $member->getCMSFields();
 		$fields->push(new HiddenField('ID','ID',$member->ID));
 
 		$actions = new FieldSet(
 			new FormAction('dosave',_t('CMSMain.SAVE', 'Save'))
 		);
-		
+
 		$validator = new Member_Validator();
-		
+
 		parent::__construct($controller, $name, $fields, $actions, $validator);
-		
+
 		$this->loadDataFrom($member);
 	}
-	
+
 	function dosave($data, $form) {
 		// don't allow ommitting or changing the ID
 		if(!isset($data['ID']) || $data['ID'] != Member::currentUserID()) {
 			return Director::redirectBack();
 		}
-		
+
 		$SQL_data = Convert::raw2sql($data);
 		$member = DataObject::get_by_id("Member", $SQL_data['ID']);
-		
+
 		if($SQL_data['Locale'] != $member->Locale) {
 			$form->addErrorMessage("Generic", _t('Member.REFRESHLANG'),"good");
 		}
-		
+
 		$form->saveInto($member);
 		$member->write();
-		
+
 		$closeLink = sprintf(
 			'<small><a href="' . $_SERVER['HTTP_REFERER'] . '" onclick="javascript:window.top.GB_hide(); return false;">(%s)</a></small>',
 			_t('ComplexTableField.CLOSEPOPUP', 'Close Popup')
 		);
 		$message = _t('Member.PROFILESAVESUCCESS', 'Successfully saved.') . ' ' . $closeLink;
 		$form->sessionMessage($message, 'good');
-		
+
 		Director::redirectBack();
 	}
 }
@@ -1793,14 +1807,14 @@ class Member_SignupEmail extends Email {
  * @subpackage security
  */
 class Member_ChangePasswordEmail extends Email {
-    protected $from = '';   // setting a blank from address uses the site's default administrator email
-    protected $subject = '';
-    protected $ss_template = 'ChangePasswordEmail';
-    
-    function __construct() {
+	protected $from = '';   // setting a blank from address uses the site's default administrator email
+	protected $subject = '';
+	protected $ss_template = 'ChangePasswordEmail';
+
+	function __construct() {
 		parent::__construct();
-    	$this->subject = _t('Member.SUBJECTPASSWORDCHANGED', "Your password has been changed", PR_MEDIUM, 'Email subject');
-    }
+		$this->subject = _t('Member.SUBJECTPASSWORDCHANGED', "Your password has been changed", PR_MEDIUM, 'Email subject');
+	}
 }
 
 
@@ -1811,14 +1825,14 @@ class Member_ChangePasswordEmail extends Email {
  * @subpackage security
  */
 class Member_ForgotPasswordEmail extends Email {
-    protected $from = '';  // setting a blank from address uses the site's default administrator email
-    protected $subject = '';
-    protected $ss_template = 'ForgotPasswordEmail';
-    
-    function __construct() {
+	protected $from = '';  // setting a blank from address uses the site's default administrator email
+	protected $subject = '';
+	protected $ss_template = 'ForgotPasswordEmail';
+
+	function __construct() {
 		parent::__construct();
-    	$this->subject = _t('Member.SUBJECTPASSWORDRESET', "Your password reset link", PR_MEDIUM, 'Email subject');
-    }
+		$this->subject = _t('Member.SUBJECTPASSWORDRESET', "Your password reset link", PR_MEDIUM, 'Email subject');
+	}
 }
 
 /**
@@ -1857,9 +1871,9 @@ class Member_Validator extends RequiredFields {
 	 */
 	function php($data) {
 		$valid = parent::php($data);
-		
+
 		$identifierField = Member::get_unique_identifier_field();
-		
+
 		$SQL_identifierField = Convert::raw2sql($data[$identifierField]);
 		$member = DataObject::get_one('Member', "\"$identifierField\" = '{$SQL_identifierField}'");
 
@@ -1955,7 +1969,7 @@ class Member_DatetimeOptionsetField extends OptionsetField {
 			$disabled = ($this->disabled || in_array($key, $this->disabledItems)) ? "disabled=\"disabled\"" : "";
 			$ATT_key = Convert::raw2att($key);
 
-			$options .= "<li class=\"".$extraClass."\"><input id=\"$itemID\" name=\"$this->name\" type=\"radio\" value=\"$key\"$checked $disabled class=\"radio\" /> <label title=\"$ATT_key\" for=\"$itemID\">$value</label></li>\n"; 
+			$options .= "<li class=\"".$extraClass."\"><input id=\"$itemID\" name=\"$this->name\" type=\"radio\" value=\"$key\"$checked $disabled class=\"radio\" /> <label title=\"$ATT_key\" for=\"$itemID\">$value</label></li>\n";
 		}
 
 		// Add "custom" input field
