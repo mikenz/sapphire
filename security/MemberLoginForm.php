@@ -13,7 +13,7 @@ class MemberLoginForm extends LoginForm {
 	public $loggedInAsField = 'FirstName';
 
 	protected $authenticator_class = 'MemberAuthenticator';
-	
+
 	/**
 	 * Constructor
 	 *
@@ -42,7 +42,7 @@ class MemberLoginForm extends LoginForm {
 		if(Director::fileExists($customCSS)) {
 			Requirements::css($customCSS);
 		}
-		
+
 		if(isset($_REQUEST['BackURL'])) {
 			$backURL = $_REQUEST['BackURL'];
 		} else {
@@ -67,7 +67,7 @@ class MemberLoginForm extends LoginForm {
 				);
 				if(Security::$autologin_enabled) {
 					$fields->push(new CheckboxField(
-						"Remember", 
+						"Remember",
 						_t('Member.REMEMBERME', "Remember me next time?")
 					));
 				}
@@ -95,7 +95,7 @@ class MemberLoginForm extends LoginForm {
 			Requirements::customScript(<<<JS
 				(function() {
 					var el = document.getElementById("MemberLoginForm_LoginForm_Email");
-					if(el && el.focus) el.focus(); 
+					if(el && el.focus) el.focus();
 				})();
 JS
 			);
@@ -132,12 +132,12 @@ JS
 
 				$cp = new ChangePasswordForm($this->controller, 'ChangePasswordForm');
 				$cp->sessionMessage('Your password has expired.  Please choose a new one.', 'good');
-				
+
 				Director::redirect('Security/changepassword');
 			} elseif(
-				isset($_REQUEST['BackURL']) 
-				&& $_REQUEST['BackURL'] 
-				// absolute redirection URLs may cause spoofing 
+				isset($_REQUEST['BackURL'])
+				&& $_REQUEST['BackURL']
+				// absolute redirection URLs may cause spoofing
 				&& Director::is_site_url($_REQUEST['BackURL'])
 			) {
 				Director::redirect($_REQUEST['BackURL']);
@@ -147,16 +147,16 @@ JS
 				$member = Member::currentUser();
 				if($member) {
 					$firstname = Convert::raw2xml($member->FirstName);
-					
+
 					if(!empty($data['Remember'])) {
 						Session::set('SessionForms.MemberLoginForm.Remember', '1');
 						$member->logIn(true);
 					} else {
 						$member->logIn();
 					}
-					
+
 					Session::set('Security.Message.message',
-						sprintf(_t('Member.WELCOMEBACK', "Welcome Back, %s"), $firstname) 
+						sprintf(_t('Member.WELCOMEBACK', "Welcome Back, %s"), $firstname)
 					);
 					Session::set("Security.Message.type", "good");
 				}
@@ -166,17 +166,17 @@ JS
 			Session::set('SessionForms.MemberLoginForm.Email', $data['Email']);
 			Session::set('SessionForms.MemberLoginForm.Remember', isset($data['Remember']));
 
-			if(isset($_REQUEST['BackURL'])) $backURL = $_REQUEST['BackURL']; 
-			else $backURL = null; 
+			if(isset($_REQUEST['BackURL'])) $backURL = $_REQUEST['BackURL'];
+			else $backURL = null;
 
-		 	if($backURL) Session::set('BackURL', $backURL);			
-			
+			if($backURL) Session::set('BackURL', $backURL);
+
 			if($badLoginURL = Session::get("BadLoginURL")) {
 				Director::redirect($badLoginURL);
 			} else {
 				// Show the right tab on failed login
-				$loginLink = Director::absoluteURL(Security::Link("login")); 
-				if($backURL) $loginLink .= '?BackURL=' . urlencode($backURL); 
+				$loginLink = Director::absoluteURL(Security::Link("login"));
+				if($backURL) $loginLink .= '?BackURL=' . urlencode($backURL);
 				Director::redirect($loginLink . '#' . $this->FormName() .'_tab');
 			}
 		}
@@ -229,12 +229,12 @@ JS
 		$member = DataObject::get_one('Member', "\"Email\" = '{$SQL_email}'");
 
 		if($member) {
-			$member->generateAutologinHash();
+			$token = $member->generateAutologinTokenAndStoreHash();
 
 			$member->sendInfo(
 				'forgotPassword',
 				array(
-					'PasswordResetLink' => Security::getPasswordResetLink($member->AutoLoginHash)
+					'PasswordResetLink' => Security::getPasswordResetLink($member, $token)
 				)
 			);
 
@@ -248,8 +248,9 @@ JS
 				_t('Member.ENTEREMAIL', 'Please enter an email address to get a password reset link.'),
 				'bad'
 			);
-			
+
 			Director::redirect('/Security/lostpassword');
 		}
 	}
 }
+
