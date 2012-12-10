@@ -1087,7 +1087,7 @@ class Versioned_Version extends ViewableData {
 	}
 
 	function Author() {
-		return DataObject::get_by_id("Member", $this->record['AuthorID']);
+		return DataObject::get_by_id("Member", $this->record['AuthorID']) ?: DataObject::get_by_id("DeletedMember", $this->record['AuthorID']);
 	}
 
 	function Publisher() {
