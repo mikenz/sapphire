@@ -2,13 +2,13 @@
 /**
 * Virtual Page creates an instance of a  page, with the same fields that the original page had, but readonly.
 * This allows you can have a page in mulitple places in the site structure, with different children without duplicating the content
-* Note: This Only duplicates $db fields and not the $has_one etc.. 
+* Note: This Only duplicates $db fields and not the $has_one etc..
 * @package cms
 */
 class VirtualPage extends Page {
-	
+
 	static $icon = array("cms/images/treeicons/page-shortcut-gold","file");
-	
+
 	/**
 	 * @var Array Define fields that are not virtual - the virtual page must define these fields themselves.
 	 * Note that anything in {@link self::$initially_copied_fields} is implicitly included in this list.
@@ -26,7 +26,7 @@ class VirtualPage extends Page {
 		"Embargo",
 		"Expiry",
 	);
-	
+
 	/**
 	 * @var Array Define fields that are initially copied to virtual pages but left modifiable after that.
 	 */
@@ -35,16 +35,16 @@ class VirtualPage extends Page {
 		'ShowInSearch',
 		'URLSegment',
 	);
-	
+
 	static $has_one = array(
-		"CopyContentFrom" => "SiteTree",	
+		"CopyContentFrom" => "SiteTree",
 	);
-	
+
 	static $db = array(
 		"VersionID" => "Int",
 	);
-	
-	/** 
+
+	/**
 	 * Generates the array of fields required for the page type.
 	 */
 	function getVirtualFields() {
@@ -65,44 +65,45 @@ class VirtualPage extends Page {
 	 * @return SiteTree Returns the linked page, or failing that, a new object.
 	 */
 	function CopyContentFrom() {
-		if(empty($this->record['CopyContentFromID'])) return new SiteTree();
+		$copyContentFromID = $this->CopyContentFromID;
+		if(!$copyContentFromID) return new SiteTree();
 
 		if(isset($this->components['CopyContentFrom']) && $this->components['CopyContentFrom'] instanceof DataObject && $this->components['CopyContentFrom']->destroyed) {
 			unset($this->components['CopyContentFrom']);
 		}
 
 		if(!isset($this->components['CopyContentFrom'])) {
-			$this->components['CopyContentFrom'] = DataObject::get_by_id("SiteTree", 
-				$this->record['CopyContentFromID']);
+			$this->components['CopyContentFrom'] = DataObject::get_by_id("SiteTree",
+				$copyContentFromID);
 
 			// Don't let VirtualPages point to other VirtualPages
 			if($this->components['CopyContentFrom'] instanceof VirtualPage) {
 				$this->components['CopyContentFrom'] = null;
 			}
-				
+
 			// has_one component semantics incidate than an empty object should be returned
 			if(!$this->components['CopyContentFrom']) {
 				$this->components['CopyContentFrom'] = new SiteTree();
 			}
 		}
-		
+
 		return $this->components['CopyContentFrom'] ? $this->components['CopyContentFrom'] : new SiteTree();
 	}
 	function setCopyContentFromID($val) {
-		if(DataObject::get_by_id('SiteTree', $val) instanceof VirtualPage) $val = 0;
+		if($val && DataObject::get_by_id('SiteTree', $val) instanceof VirtualPage) $val = 0;
 		return $this->setField("CopyContentFromID", $val);
 	}
- 
+
 	function ContentSource() {
 		return $this->CopyContentFrom();
 	}
-	
+
 	function allowedChildren() {
 		if($this->CopyContentFrom()) {
 			return $this->CopyContentFrom()->allowedChildren();
 		}
 	}
-	
+
 	public function syncLinkTracking() {
 		if($this->CopyContentFromID) {
 			$this->HasBrokenLink = !(bool) DataObject::get_by_id('SiteTree', $this->CopyContentFromID);
@@ -110,14 +111,14 @@ class VirtualPage extends Page {
 			$this->HasBrokenLink = true;
 		}
 	}
-	
+
 	/**
 	 * We can only publish the page if there is a published source page
 	 */
 	public function canPublish($member = null) {
 		return $this->isPublishable() && parent::canPublish($member);
 	}
-	
+
 	/**
 	 * Return true if we can delete this page from the live site, which is different from can
 	 * we publish it.
@@ -125,11 +126,11 @@ class VirtualPage extends Page {
 	public function canDeleteFromLive($member = null) {
 		return parent::canPublish($member);
 	}
-	
+
 	/**
 	 * Returns true if is page is publishable by anyone at all
 	 * Return false if the source page isn't published yet.
-	 * 
+	 *
 	 * Note that isPublishable doesn't affect ete from live, only publish.
 	 */
 	public function isPublishable() {
@@ -137,31 +138,31 @@ class VirtualPage extends Page {
 		if(!$this->CopyContentFrom() || !$this->CopyContentFrom()->ID) {
 			return false;
 		}
-		
+
 		// Unpublished source
 		if(!Versioned::get_versionnumber_by_stage('SiteTree', 'Live', $this->CopyContentFromID)) {
 			return false;
 		}
-		
+
 		// Default - publishable
 		return true;
 	}
-		
+
 	/**
 	 * Generate the CMS fields from the fields from the original page.
 	 */
 	function getCMSFields($cms = null) {
 		$fields = parent::getCMSFields($cms);
-		
+
 		// Setup the linking to the original page.
 		$copyContentFromField = new TreeDropdownField(
-			"CopyContentFromID", 
-			_t('VirtualPage.CHOOSE', "Choose a page to link to"), 
+			"CopyContentFromID",
+			_t('VirtualPage.CHOOSE', "Choose a page to link to"),
 			"SiteTree"
 		);
 		// filter doesn't let you select children of virtual pages as as source page
 		//$copyContentFromField->setFilterFunction(create_function('$item', 'return !($item instanceof VirtualPage);'));
-		
+
 		// Setup virtual fields
 		if($virtualFields = $this->getVirtualFields()) {
 			$roTransformation = new ReadonlyTransformation();
@@ -170,29 +171,29 @@ class VirtualPage extends Page {
 					$fields->replaceField($virtualField, $fields->dataFieldByName($virtualField)->transform($roTransformation));
 			}
 		}
-		
+
 		// Add fields to the tab
-		$fields->addFieldToTab("Root.Content.Main", 
-			new HeaderField('VirtualPageHeader',_t('VirtualPage.HEADER', "This is a virtual page")), 
+		$fields->addFieldToTab("Root.Content.Main",
+			new HeaderField('VirtualPageHeader',_t('VirtualPage.HEADER', "This is a virtual page")),
 			"Title"
 		);
 		$fields->addFieldToTab("Root.Content.Main", $copyContentFromField, "Title");
-		
+
 		// Create links back to the original object in the CMS
 		if($this->CopyContentFrom()->ID) {
-			$linkToContent = "<a class=\"cmsEditlink\" href=\"admin/show/$this->CopyContentFromID\">" . 
+			$linkToContent = "<a class=\"cmsEditlink\" href=\"admin/show/$this->CopyContentFromID\">" .
 				_t('VirtualPage.EDITCONTENT', 'click here to edit the content') . "</a>";
-			$fields->addFieldToTab("Root.Content.Main", 
-				$linkToContentLabelField = new LabelField('VirtualPageContentLinkLabel', $linkToContent), 
+			$fields->addFieldToTab("Root.Content.Main",
+				$linkToContentLabelField = new LabelField('VirtualPageContentLinkLabel', $linkToContent),
 				"Title"
 			);
 			$linkToContentLabelField->setAllowHTML(true);
 		}
-	
+
 		return $fields;
 	}
-	
-	/** 
+
+	/**
 	 * We have to change it to copy all the content from the original page first.
 	 */
 	function onBeforeWrite() {
@@ -206,10 +207,10 @@ class VirtualPage extends Page {
 		) {
 			// On publication to live, copy from published source.
 			$performCopyFrom = true;
-		
+
 			$stageSourceVersion = DB::query("SELECT \"Version\" FROM \"SiteTree\" WHERE \"ID\" = $this->CopyContentFromID")->value();
 			$liveSourceVersion = DB::query("SELECT \"Version\" FROM \"SiteTree_Live\" WHERE \"ID\" = $this->CopyContentFromID")->value();
-		
+
 			// We're going to create a new VP record in SiteTree_versions because the published
 			// version might not exist, unless we're publishing the latest version
 			if($stageSourceVersion != $liveSourceVersion) {
@@ -219,26 +220,26 @@ class VirtualPage extends Page {
 			// On regular write, copy from draft source. This is only executed when the source page changes.
 			$performCopyFrom = $this->isChanged('CopyContentFromID', 2) && $this->CopyContentFromID != 0;
 		}
-		
- 		if($performCopyFrom && $this instanceof VirtualPage) {
+
+		if($performCopyFrom && $this instanceof VirtualPage) {
 			// This flush is needed because the get_one cache doesn't respect site version :-(
 			singleton('SiteTree')->flushCache();
 			$source = DataObject::get_one("SiteTree",sprintf('"SiteTree"."ID" = %d', $this->CopyContentFromID));
 			// Leave the updating of image tracking until after write, in case its a new record
 			$this->copyFrom($source, false);
 		}
-		
+
 		parent::onBeforeWrite();
 	}
-	
+
 	function onAfterWrite() {
 		parent::onAfterWrite();
 
 		// Don't do this stuff when we're publishing
 		if(!$this->extension_instances['Versioned']->migratingVersion) {
-	 		if(
+			if(
 				$this->isChanged('CopyContentFromID')
-	 			&& $this->CopyContentFromID != 0 
+				&& $this->CopyContentFromID != 0
 				&& $this instanceof VirtualPage
 			) {
 				$this->updateImageTracking();
@@ -260,9 +261,9 @@ class VirtualPage extends Page {
 					// Note: *_versions records are left intact
 					foreach(array('', 'Live') as $stage) {
 						if($stage) $removedTable = "{$removedTable}_{$stage}";
-						DB::query(sprintf('DELETE FROM "%s" WHERE "ID" = %d', $removedTable, $this->ID));					
+						DB::query(sprintf('DELETE FROM "%s" WHERE "ID" = %d', $removedTable, $this->ID));
 					}
-				}	
+				}
 
 				// Also publish the change immediately to avoid inconsistent behaviour between
 				// a non-virtual draft and a virtual live record (e.g. republishing the original record
@@ -276,7 +277,7 @@ class VirtualPage extends Page {
 				$this->CopyContentFromID = 0;
 			}
 		}
-		
+
 		FormResponse::add("$('Form_EditForm').reloadIfSetTo($this->ID);", $this->ID."_VirtualPage_onAfterWrite");
 	}
 
@@ -289,8 +290,8 @@ class VirtualPage extends Page {
 			$result->error(
 				sprintf(
 					_t(
-						'VirtualPage.PageTypNotAllowedOnRoot', 
-						'Original page type "%s" is not allowed on the root level for this virtual page', 
+						'VirtualPage.PageTypNotAllowedOnRoot',
+						'Original page type "%s" is not allowed on the root level for this virtual page',
 						PR_MEDIUM,
 						'First argument is a class name'
 					),
@@ -302,10 +303,10 @@ class VirtualPage extends Page {
 
 		return $result;
 	}
-	
+
 	/**
 	 * Ensure we have an up-to-date version of everything.
-	 * 
+	 *
 	 * @param SiteTree
 	 * @param Boolean
 	 */
@@ -314,7 +315,7 @@ class VirtualPage extends Page {
 			foreach($this->getVirtualFields() as $virtualField) {
 				$this->$virtualField = $source->$virtualField;
 			}
-			
+
 			// We also want to copy certain, but only if we're copying the source page for the first
 			// time. After this point, the user is free to customise these for the virtual page themselves.
 			if($this->isChanged('CopyContentFromID', 2) && $this->CopyContentFromID != 0) {
@@ -322,18 +323,18 @@ class VirtualPage extends Page {
 					$this->$fieldName = $source->$fieldName;
 				}
 			}
-			
+
 			if($updateImageTracking) $this->updateImageTracking();
 		}
 	}
-	
+
 	function updateImageTracking() {
 		// Doesn't work on unsaved records
 		if(!$this->ID) return;
 
 		// Remove CopyContentFrom() from the cache
 		unset($this->components['CopyContentFrom']);
-		
+
 		// Update ImageTracking
 		$this->ImageTracking()->setByIdList($this->CopyContentFrom()->ImageTracking()->column('ID'));
 	}
@@ -341,12 +342,12 @@ class VirtualPage extends Page {
 	function CMSTreeClasses($controller) {
 		return parent::CMSTreeClasses($controller) . ' VirtualPage-' . $this->CopyContentFrom()->ClassName;
 	}
-	
+
 	/**
 	 * Allow attributes on the master page to pass
 	 * through to the virtual page
 	 *
-	 * @param string $field 
+	 * @param string $field
 	 * @return mixed
 	 */
 	function __get($field) {
@@ -358,12 +359,12 @@ class VirtualPage extends Page {
 			return $this->copyContentFrom()->$field;
 		}
 	}
-	
+
 	/**
 	 * Pass unrecognized method calls on to the original data object
 	 *
-	 * @param string $method 
-	 * @param string $args 
+	 * @param string $method
+	 * @param string $args
 	 */
 	function __call($method, $args) {
 		if(parent::hasMethod($method)) {
@@ -375,18 +376,18 @@ class VirtualPage extends Page {
 
 	public function hasField($field) {
 		return (
-			array_key_exists($field, $this->record) 
-			|| $this->hasDatabaseField($field) 
+			array_key_exists($field, $this->record)
+			|| $this->hasDatabaseField($field)
 			|| array_key_exists($field, $this->db()) // Needed for composite fields
 			|| parent::hasMethod("get{$field}")
 			|| $this->CopyContentFrom()->hasField($field)
 		);
-	}	
+	}
 	/**
 	 * Overwrite to also check for method on the original data object
 	 *
-	 * @param string $method 
-	 * @return bool 
+	 * @param string $method
+	 * @return bool
 	 */
 	function hasMethod($method) {
 		if(parent::hasMethod($method)) return true;
@@ -399,11 +400,11 @@ class VirtualPage extends Page {
  * @package cms
  */
 class VirtualPage_Controller extends Page_Controller {
-	
+
 	static $allowed_actions = array(
 		'loadcontentall' => 'ADMIN',
 	);
-	
+
 	/**
 	 * Reloads the content if the version is different ;-)
 	 */
@@ -412,7 +413,7 @@ class VirtualPage_Controller extends Page_Controller {
 		$this->failover->write();
 		return;
 	}
-	
+
 	function getViewer($action) {
 		$originalClass = get_class($this->CopyContentFrom());
 		if ($originalClass == 'SiteTree') $name = 'Page_Controller';
@@ -420,7 +421,7 @@ class VirtualPage_Controller extends Page_Controller {
 		$controller = new $name();
 		return $controller->getViewer($action);
 	}
-	
+
 	/**
 	 * When the virtualpage is loaded, check to see if the versions are the same
 	 * if not, reload the content.
@@ -446,16 +447,16 @@ class VirtualPage_Controller extends Page_Controller {
 			echo "<li>Published $page->URLSegment";
 		}
 	}
-	
+
 	/**
 	 * Also check the original object's original controller for the method
 	 *
-	 * @param string $method 
-	 * @return bool 
+	 * @param string $method
+	 * @return bool
 	 */
 	function hasMethod($method) {
 		$haveIt = parent::hasMethod($method);
-		if (!$haveIt) {	
+		if (!$haveIt) {
 			$originalClass = get_class($this->CopyContentFrom());
 			if ($originalClass == 'SiteTree') $name = 'ContentController';
 			else $name = $originalClass."_Controller";
@@ -464,12 +465,12 @@ class VirtualPage_Controller extends Page_Controller {
 		}
 		return $haveIt;
 	}
-	
+
 	/**
 	 * Pass unrecognized method calls on to the original controller
 	 *
-	 * @param string $method 
-	 * @param string $args 
+	 * @param string $method
+	 * @param string $args
 	 */
 	function __call($method, $args) {
 		try {

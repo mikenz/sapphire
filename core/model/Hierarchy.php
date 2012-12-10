@@ -6,25 +6,25 @@
  * @subpackage model
  */
 class Hierarchy extends DataObjectDecorator {
-	
+
 	protected $markedNodes;
-	
+
 	protected $markingFilter;
-	
+
 	/**
 	 * @var Int
 	 */
 	protected $_cache_numChildren;
-	
+
 	function augmentSQL(SQLQuery &$query) {
 	}
 
 	function augmentDatabase() {
 	}
-	
+
 	function augmentWrite(&$manipulation) {
 	}
-	
+
 	function extraStatics($class = null) {
 		return array(
 			'has_one' => array(
@@ -50,11 +50,11 @@ class Hierarchy extends DataObjectDecorator {
 		if($limitToMarked && $rootCall) {
 			$this->markingFinished($numChildrenMethod);
 		}
-		
+
 		if($this->owner->hasMethod($childrenMethod)) {
 			$children = $this->owner->$childrenMethod($extraArg);
 		} else {
-			user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children", 
+			user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children",
 				$childrenMethod, get_class($this->owner)), E_USER_ERROR);
 		}
 
@@ -62,33 +62,33 @@ class Hierarchy extends DataObjectDecorator {
 			if($attributes) {
 				$attributes = " $attributes";
 			}
-			
+
 			$output = "<ul$attributes>\n";
-		
+
 			foreach($children as $child) {
 				if(!$limitToMarked || $child->isMarked()) {
 					$foundAChild = true;
-					$output .= eval("return $titleEval;") . "\n" . 
+					$output .= eval("return $titleEval;") . "\n" .
 					$child->getChildrenAsUL("", $titleEval, $extraArg, $limitToMarked, $childrenMethod, $numChildrenMethod, false, $minNodeCount) . "</li>\n";
 				}
 			}
-			
+
 			$output .= "</ul>\n";
 		}
-		
+
 		if(isset($foundAChild) && $foundAChild) {
 			return $output;
 		}
 	}
-	
+
 	/**
 	 * Mark a segment of the tree, by calling mark().
 	 * The method performs a breadth-first traversal until the number of nodes is more than minCount.
 	 * This is used to get a limited number of tree nodes to show in the CMS initially.
-	 * 
-	 * This method returns the number of nodes marked.  After this method is called other methods 
+	 *
+	 * This method returns the number of nodes marked.  After this method is called other methods
 	 * can check isExpanded() and isMarked() on individual nodes.
-	 * 
+	 *
 	 * @param int $minNodeCount The minimum amount of nodes to mark.
 	 * @return int The actual number of nodes marked.
 	 */
@@ -104,10 +104,10 @@ class Hierarchy extends DataObjectDecorator {
 			if($minNodeCount && sizeof($this->markedNodes) >= $minNodeCount) {
 				break;
 			}
-		}		
+		}
 		return sizeof($this->markedNodes);
 	}
-	
+
 	/**
 	 * Filter the marking to only those object with $node->$parameterName = $parameterValue
 	 * @param string $parameterName The parameter on each node to check when marking.
@@ -150,7 +150,7 @@ class Hierarchy extends DataObjectDecorator {
 						break;
 					}
 				}
-				return $ret;		
+				return $ret;
 			} else {
 				return ($node->$parameterName == $this->markingFilter['value']);
 			}
@@ -158,7 +158,7 @@ class Hierarchy extends DataObjectDecorator {
 			return call_user_func($func, $node);
 		}
 	}
-	
+
 	/**
 	 * Mark all children of the given node that match the marking filter.
 	 * @param DataObject $node Parent node.
@@ -167,10 +167,10 @@ class Hierarchy extends DataObjectDecorator {
 		if($node->hasMethod($childrenMethod)) {
 			$children = $node->$childrenMethod($context);
 		} else {
-			user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children", 
+			user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children",
 				$childrenMethod, get_class($this->owner)), E_USER_ERROR);
 		}
-		
+
 		$node->markExpanded();
 		if($children) {
 			foreach($children as $child) {
@@ -185,7 +185,7 @@ class Hierarchy extends DataObjectDecorator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Ensure marked nodes that have children are also marked expanded.
 	 * Call this after marking but before iterating over the tree.
@@ -200,7 +200,7 @@ class Hierarchy extends DataObjectDecorator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Return CSS classes of 'unexpanded', 'closed', both, or neither, depending on
 	 * the marking of this DataObject.
@@ -215,7 +215,7 @@ class Hierarchy extends DataObjectDecorator {
 		}
 		return $classes;
 	}
-	
+
 	/**
 	 * Mark the children of the DataObject with the given ID.
 	 * @param int $id ID of parent node.
@@ -235,7 +235,7 @@ class Hierarchy extends DataObjectDecorator {
 
 	/**
 	 * Expose the given object in the tree, by marking this page and all it ancestors.
-	 * @param DataObject $childObj 
+	 * @param DataObject $childObj
 	 */
 	public function markToExpose($childObj) {
 		if(is_object($childObj)){
@@ -245,7 +245,7 @@ class Hierarchy extends DataObjectDecorator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Return the IDs of all the marked nodes
 	 */
@@ -259,33 +259,33 @@ class Hierarchy extends DataObjectDecorator {
 	 */
 	public function parentStack() {
 		$p = $this->owner;
-		
+
 		while($p) {
 			$stack[] = $p;
 			$p = $p->ParentID ? $p->Parent() : null;
 		}
-		
+
 		return $stack;
 	}
-	
+
 	/**
 	 * True if this DataObject is marked.
 	 * @var boolean
 	 */
 	protected static $marked = array();
-	
+
 	/**
 	 * True if this DataObject is expanded.
 	 * @var boolean
 	 */
 	protected static $expanded = array();
-	
+
 	/**
 	 * True if this DataObject is opened.
 	 * @var boolean
 	 */
 	protected static $treeOpened = array();
-	
+
 	/**
 	 * Mark this DataObject as expanded.
 	 */
@@ -293,7 +293,7 @@ class Hierarchy extends DataObjectDecorator {
 		self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = true;
 		self::$expanded[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = true;
 	}
-	
+
 	/**
 	 * Mark this DataObject as unexpanded.
 	 */
@@ -301,7 +301,7 @@ class Hierarchy extends DataObjectDecorator {
 		self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = true;
 		self::$expanded[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = false;
 	}
-	
+
 	/**
 	 * Mark this DataObject's tree as opened.
 	 */
@@ -309,7 +309,7 @@ class Hierarchy extends DataObjectDecorator {
 		self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = true;
 		self::$treeOpened[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID] = true;
 	}
-	
+
 	/**
 	 * Check if this DataObject is marked.
 	 * @return boolean
@@ -319,7 +319,7 @@ class Hierarchy extends DataObjectDecorator {
 		$id = $this->owner->ID;
 		return isset(self::$marked[$baseClass][$id]) ? self::$marked[$baseClass][$id] : false;
 	}
-	
+
 	/**
 	 * Check if this DataObject is expanded.
 	 * @return boolean
@@ -329,7 +329,7 @@ class Hierarchy extends DataObjectDecorator {
 		$id = $this->owner->ID;
 		return isset(self::$expanded[$baseClass][$id]) ? self::$expanded[$baseClass][$id] : false;
 	}
-	
+
 	/**
 	 * Check if this DataObject's tree is opened.
 	 */
@@ -347,16 +347,16 @@ class Hierarchy extends DataObjectDecorator {
 		if($children) {
 			if($attributes) $attributes = " $attributes";
 			$output = "<ul$attributes>\n";
-		
+
 			foreach($children as $child) {
-				$output .= eval("return $titleEval;") . "\n" . 
+				$output .= eval("return $titleEval;") . "\n" .
 					$child->getChildrenAsUL("", $titleEval, $extraArg) . "</li>\n";
 			}
 			$output .= "</ul>\n";
 		}
 		return $output;
 	}
-	
+
 	/**
 	 * Get a list of this DataObject's and all it's descendants IDs.
 	 * @return int
@@ -366,7 +366,7 @@ class Hierarchy extends DataObjectDecorator {
 		$this->loadDescendantIDListInto($idList);
 		return $idList;
 	}
-	
+
 	/**
 	 * Get a list of this DataObject's and all it's descendants ID, and put it in $idList.
 	 * @var array $idList Array to put results in.
@@ -385,23 +385,23 @@ class Hierarchy extends DataObjectDecorator {
 			}
 		}
 	}
-	
+
 	/**
 	 * Get the children for this DataObject.
 	 * @return DataObjectSet
 	 */
 	public function Children() {
-		if(!(isset($this->_cache_children) && $this->_cache_children)) { 
-			$result = $this->owner->stageChildren(false); 
-		 	if(isset($result)) { 
-		 		$this->_cache_children = new DataObjectSet(); 
-		 		foreach($result as $child) { 
-		 			if($child->canView()) { 
-		 				$this->_cache_children->push($child); 
-		 			} 
-		 		} 
-		 	} 
-		} 
+		if(!(isset($this->_cache_children) && $this->_cache_children)) {
+			$result = $this->owner->stageChildren(false);
+			if(isset($result)) {
+				$this->_cache_children = new DataObjectSet();
+				foreach($result as $child) {
+					if($child->canView()) {
+						$this->_cache_children->push($child);
+					}
+				}
+			}
+		}
 		return $this->_cache_children;
 	}
 
@@ -424,7 +424,7 @@ class Hierarchy extends DataObjectDecorator {
 	public function AllChildrenIncludingDeleted($context = null) {
 		return $this->doAllChildrenIncludingDeleted($context);
 	}
-	
+
 	/**
 	 * @see AllChildrenIncludingDeleted
 	 *
@@ -433,17 +433,17 @@ class Hierarchy extends DataObjectDecorator {
 	 */
 	public function doAllChildrenIncludingDeleted($context = null) {
 		if(!$this->owner) user_error('Hierarchy::doAllChildrenIncludingDeleted() called without $this->owner');
-		
+
 		$idxStageChildren = array();
 		$idxLiveChildren = array();
-		
+
 		$baseClass = ClassInfo::baseDataClass($this->owner->class);
 		if($baseClass) {
 			$stageChildren = $this->owner->stageChildren(true);
-			
+
 			// Add live site content that doesn't exist on the stage site, if required.
 			if($this->owner->hasExtension('Versioned')) {
-				// Next, go through the live children.  Only some of these will be listed					
+				// Next, go through the live children.  Only some of these will be listed
 				$liveChildren = $this->owner->liveChildren(true, true);
 				if($liveChildren) {
 					foreach($liveChildren as $child) {
@@ -452,32 +452,32 @@ class Hierarchy extends DataObjectDecorator {
 				}
 			}
 
-			$this->owner->extend("augmentAllChildrenIncludingDeleted", $stageChildren, $context); 
-			
+			$this->owner->extend("augmentAllChildrenIncludingDeleted", $stageChildren, $context);
+
 		} else {
 			user_error("Hierarchy::AllChildren() Couldn't determine base class for '{$this->owner->class}'", E_USER_ERROR);
 		}
-		
+
 		return $stageChildren;
 	}
-	
+
 	/**
 	 * Return all the children that this page had, including pages that were deleted
 	 * from both stage & live.
 	 */
 	public function AllHistoricalChildren() {
 		$baseClass=ClassInfo::baseDataClass($this->owner->class);
-		return Versioned::get_including_deleted($baseClass, 
+		return Versioned::get_including_deleted($baseClass,
 			"\"ParentID\" = " . (int)$this->owner->ID, "\"$baseClass\".\"ID\" ASC");
 	}
-	
+
 	/**
 	 * Return the number of children that this page ever had, including pages that were deleted
 	 */
 	public function numHistoricalChildren() {
-		$query = Versioned::get_including_deleted_query(ClassInfo::baseDataClass($this->owner->class), 
+		$query = Versioned::get_including_deleted_query(ClassInfo::baseDataClass($this->owner->class),
 			"\"ParentID\" = " . (int)$this->owner->ID);
-			
+
 		return $query->unlimitedRowCount();
 	}
 
@@ -485,24 +485,24 @@ class Hierarchy extends DataObjectDecorator {
 	 * Return the number of direct children.
 	 * By default, values are cached after the first invocation.
 	 * Can be augumented by {@link augmentNumChildrenCountQuery()}.
-	 * 
+	 *
 	 * @param Boolean $cache
 	 * @return int
 	 */
 	public function numChildren($cache = true) {
 		$baseClass = ClassInfo::baseDataClass($this->owner->class);
-		
+
 		// Build the cache for this class if it doesn't exist.
 		if(!$cache || !is_numeric($this->_cache_numChildren)) {
 			// We build the query in an extension-friendly way.
 			$query = new SQLQuery(
 				"COUNT(*)",
-				"\"$baseClass\"", 
+				"\"$baseClass\"",
 				sprintf('"ParentID" = %d', $this->owner->ID)
 			);
 			$this->owner->extend('augmentSQL', $query);
 			$this->owner->extend('augmentNumChildrenCountQuery', $query);
-			 
+
 			$this->_cache_numChildren = (int)$query->execute()->value();
 		}
 
@@ -512,7 +512,7 @@ class Hierarchy extends DataObjectDecorator {
 
 	/**
 	 * Return children from the stage site
-	 * 
+	 *
 	 * @param showAll Inlcude all of the elements, even those not shown in the menus.
 	 *   (only applicable when extension is applied to {@link SiteTree}).
 	 * @return DataObjectSet
@@ -523,13 +523,13 @@ class Hierarchy extends DataObjectDecorator {
 		} else {
 			$extraFilter = '';
 		}
-		
+
 		$baseClass = ClassInfo::baseDataClass($this->owner->class);
-		
-		$staged = DataObject::get($baseClass, "\"{$baseClass}\".\"ParentID\" = " 
+
+		$staged = DataObject::get($baseClass, "\"{$baseClass}\".\"ParentID\" = "
 			. (int)$this->owner->ID . " AND \"{$baseClass}\".\"ID\" != " . (int)$this->owner->ID
 			. $extraFilter, "");
-			
+
 		if(!$staged) $staged = new DataObjectSet();
 		$this->owner->extend("augmentStageChildren", $staged, $showAll);
 		return $staged;
@@ -537,51 +537,44 @@ class Hierarchy extends DataObjectDecorator {
 
 	/**
 	 * Return children from the live site, if it exists.
-	 * 
+	 *
 	 * @param boolean $showAll Include all of the elements, even those not shown in the menus.
 	 *   (only applicable when extension is applied to {@link SiteTree}).
 	 * @param boolean $onlyDeletedFromStage Only return items that have been deleted from stage
 	 * @return DataObjectSet
 	 */
 	public function liveChildren($showAll = false, $onlyDeletedFromStage = false) {
-		if($this->owner->db('ShowInMenus')) {
-			$extraFilter = ($showAll) ? '' : " AND \"ShowInMenus\"=1";
-		} else {
-			$extraFilter = '';
-		}
+		if(!$this->owner->hasExtension('Versioned')) throw new Exception('Hierarchy->liveChildren() only works with Versioned extension applied');
+
 		$join = "";
 
 		$baseClass = ClassInfo::baseDataClass($this->owner->class);
+		$id = $this->owner->ID;
 
-		$filter = "\"{$baseClass}\".\"ParentID\" = " . (int)$this->owner->ID 
-			. " AND \"{$baseClass}\".\"ID\" != " . (int)$this->owner->ID;
-		
+		$oldStage = Versioned::current_stage();
+
+		$filter = "\"{$baseClass}\".\"ParentID\" = $id AND \"{$baseClass}\".\"ID\" != $id";
+		if(!$showAll) $filter .= ' AND "ShowInMenus" = 1';
+
 		if($onlyDeletedFromStage) {
 			// Note that the lack of double-quotes around $baseClass are the only thing preventing
 			// it from being rewritten to {$baseClass}_Live.  This is brittle and a little clumsy
 			$join = "LEFT JOIN {$baseClass} ON {$baseClass}.\"ID\" = \"{$baseClass}\".\"ID\"";
 			$filter .=  " AND {$baseClass}.\"ID\" IS NULL";
+
+			Versioned::reading_stage('Live');
+			$children = DataObject::get($baseClass, $filter, null, $join);
+
+		} else {
+			Versioned::reading_stage('Live');
+			$children = DataObject::get($baseClass, $filter);
 		}
 
-		$oldStage = Versioned::current_stage();
-		Versioned::reading_stage('Live');
-		
-		// Singleton is necessary and not $this->owner so as not to muck with Translatable's
-		// behaviour.
-		$query = singleton($baseClass)->extendedSQL($filter, null, null, $join);
-
-		// Since we didn't include double quotes in the join & filter, we need to add them into the
-		// SQL now, after Versioned has done is query rewriting
-		$correctedSQL = str_replace(array("LEFT JOIN {$baseClass}", "{$baseClass}.\"ID\""),
-			array("LEFT JOIN \"{$baseClass}\"", "\"{$baseClass}\".\"ID\""), $query->sql());
-
-		$result = $this->owner->buildDataObjectSet(DB::query($correctedSQL));
-		
 		Versioned::reading_stage($oldStage);
-		
-		return $result;
+
+		return $children;
 	}
-	
+
 	/**
 	 * Get the parent of this class.
 	 * @return DataObject
@@ -594,7 +587,7 @@ class Hierarchy extends DataObjectDecorator {
 			return DataObject::get_one($this->owner->class, $filter);
 		}
 	}
-	
+
 	/**
 	 * Return all the parents of this class in a set ordered from the lowest to highest parent.
 	 *
@@ -603,18 +596,18 @@ class Hierarchy extends DataObjectDecorator {
 	public function getAncestors() {
 		$ancestors = new DataObjectSet();
 		$object    = $this->owner;
-		
+
 		while($object = $object->getParent()) {
 			$ancestors->push($object);
 		}
-		
+
 		return $ancestors;
 	}
-	
+
 	/**
 	 * Get the next node in the tree of the type. If there is no instance of the className descended from this node,
 	 * then search the parents.
-	 * 
+	 *
 	 * @todo Write!
 	 */
 	public function naturalPrev( $className, $afterNode = null ) {
@@ -637,36 +630,36 @@ class Hierarchy extends DataObjectDecorator {
 				return $this->owner;
 			}
 		}
-			
+
 		$nextNode = null;
 		$baseClass = ClassInfo::baseDataClass($this->owner->class);
-		
+
 		$children = DataObject::get(ClassInfo::baseDataClass($this->owner->class), "\"$baseClass\".\"ParentID\"={$this->owner->ID}" . ( ( $afterNode ) ? " AND \"Sort\" > " . sprintf( '%d', $afterNode->Sort ) : "" ), '"Sort" ASC');
-		
+
 		// Try all the siblings of this node after the given node
 		/*if( $siblings = DataObject::get( ClassInfo::baseDataClass($this->owner->class), "\"ParentID\"={$this->owner->ParentID}" . ( $afterNode ) ? "\"Sort\" > {$afterNode->Sort}" : "" , '\"Sort\" ASC' ) )
 			$searchNodes->merge( $siblings );*/
-		
+
 		if($children) {
 			foreach($children as $node) {
 				if($nextNode = $node->naturalNext($className, $node->ID, $this->owner)) {
 					break;
 				}
 			}
-			
+
 			if($nextNode) {
 				return $nextNode;
 			}
 		}
-		
+
 		// if this is not an instance of the root class or has the root id, search the parent
 		if(!(is_numeric($root) && $root == $this->owner->ID || $root == $this->owner->class) && ($parent = $this->owner->Parent())) {
 			return $parent->naturalNext( $className, $root, $this->owner );
 		}
-		
+
 		return null;
 	}
-	
+
 	function flushCache() {
 		$this->_cache_children = null;
 		$this->_cache_numChildren = null;
