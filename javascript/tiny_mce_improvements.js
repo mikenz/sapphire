@@ -620,7 +620,6 @@ ImageThumbnail.prototype = {
 	insert: function() {
 		var formObj = $('Form_EditorToolbarImageForm');
 		var altText = formObj.elements.AltText.value;
-		var titleText = formObj.elements.ImageTitle.value;
 		var cssClass = formObj.elements.CSSClass.value;
 		var baseURL = document.getElementsByTagName('base')[0].href;
 		var relativeHref = this.href.substr(baseURL.length);
@@ -632,9 +631,9 @@ ImageThumbnail.prototype = {
 		var data = {
 			'src' : relativeHref,
 			'alt' : altText,
+			'title' : altText,
 			'width' : $('Form_EditorToolbarImageForm_Width').value,
 			'height' : $('Form_EditorToolbarImageForm_Height').value,
-			'title' : titleText,
 			'class' : cssClass
 		};
 		this.ssInsertImage(tinyMCE.activeEditor, data, captionText);
