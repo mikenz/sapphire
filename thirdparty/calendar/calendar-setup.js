@@ -1,5 +1,6 @@
 var CalendarBehaviour = {
 		initialise: function () {
+		  if (!$(this.id + "-calendar")) { return false; }
 		  this.calendarObj = Calendar.setup({
 		    inputField  : this.id,         // ID of the input field
 		    ifFormat    : "%d/%m/%Y",    // the date format
