@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('fr_FR', $lang) && is_array($lang['fr_FR'])) {
 	$lang['fr_FR'] = array_merge($lang['en_US'], $lang['fr_FR']);
 } else {
 	$lang['fr_FR'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['fr_FR']['AdvancedSearchForm']['ALLWORDS'] = 'Tous les mots';

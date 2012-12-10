@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('nl_NL', $lang) && is_array($lang['nl_NL'])) {
 	$lang['nl_NL'] = array_merge($lang['en_US'], $lang['nl_NL']);
 } else {
 	$lang['nl_NL'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['nl_NL']['']['NOBACKLINKEDPAGES'] = 'Er zijn geen pagina\'s naar deze pagina gelinkt';
@@ -472,7 +476,7 @@ $lang['nl_NL']['Security']['NOTHINGTOENCRYPT2'] = 'Er zijn geen leden met een du
 $lang['nl_NL']['Security']['PASSWORDSENTHEADER'] = 'Link om Uw wachtwoord opnieuw aan te maken is verstuurd naar \'%s\'';
 $lang['nl_NL']['Security']['PASSWORDSENTTEXT'] = 'Bedankt! De link om je wachtwoord opnieuw in te stellen is verstuurd naar \'%s\'.';
 $lang['nl_NL']['Security']['PERMFAILURE'] = 'Die pagina is beveiligd en voor de toegang heb je administrator rechten nodig. Vul hieronder je gegevens in en we sturen je door.';
-$lang['nl_NL']['SecurityAdmin']['ADVANCEDONLY'] = 'Dit onderdeel is alleen voor geavanceerde gebruikers. 
+$lang['nl_NL']['SecurityAdmin']['ADVANCEDONLY'] = 'Dit onderdeel is alleen voor geavanceerde gebruikers.
 Zie <a href="http://doc.silverstripe.com/doku.php?id=permissions:codes" target="_blank"> deze pagina </a> voor meer informatie.';
 $lang['nl_NL']['SecurityAdmin']['CODE'] = 'Code';
 $lang['nl_NL']['SecurityAdmin']['GROUPNAME'] = 'Groep naam';

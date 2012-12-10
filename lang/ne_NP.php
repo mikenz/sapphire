@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('ne_NP', $lang) && is_array($lang['ne_NP'])) {
 	$lang['ne_NP'] = array_merge($lang['en_US'], $lang['ne_NP']);
 } else {
 	$lang['ne_NP'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['ne_NP']['BasicAuth']['ENTERINFO'] = 'कृपया एउता प्रयोगकता नाम र पासओड हल्नुहोस्';

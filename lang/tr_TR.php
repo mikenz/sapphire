@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('tr_TR', $lang) && is_array($lang['tr_TR'])) {
 	$lang['tr_TR'] = array_merge($lang['en_US'], $lang['tr_TR']);
 } else {
 	$lang['tr_TR'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['tr_TR']['AdvancedSearchForm']['ALLWORDS'] = 'Tüm Kelimeler';
@@ -485,7 +489,7 @@ $lang['tr_TR']['SiteTree']['METAKEYWORDS'] = 'Anahtar kelimeler';
 $lang['tr_TR']['SiteTree']['METATITLE'] = 'Başlık';
 $lang['tr_TR']['SiteTree']['MODIFIEDONDRAFT'] = '"Taslak site" üzerinde değiştirildi';
 $lang['tr_TR']['SiteTree']['NOBACKLINKS'] = 'Hiç bir sayfa bu sayfaya link vermemiştir.';
-$lang['tr_TR']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Bu sayfayı şu alan adları için anasayfa olarak belirle: 
+$lang['tr_TR']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Bu sayfayı şu alan adları için anasayfa olarak belirle:
 (Alan adlarını virgülle ayırınız)';
 $lang['tr_TR']['SiteTree']['PAGESLINKING'] = 'Şu sayfalar bu sayfaya link vermişlerdir:';
 $lang['tr_TR']['SiteTree']['PAGETITLE'] = 'Sayfa ismi';

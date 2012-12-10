@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('ja_JP', $lang) && is_array($lang['ja_JP'])) {
 	$lang['ja_JP'] = array_merge($lang['en_US'], $lang['ja_JP']);
 } else {
 	$lang['ja_JP'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['ja_JP']['AdvancedSearchForm']['ALLWORDS'] = '全ての単語';
@@ -432,7 +436,7 @@ $lang['ja_JP']['Security']['NOTHINGTOENCRYPT1'] = '全く暗号化しないパ�
 $lang['ja_JP']['Security']['NOTHINGTOENCRYPT2'] = 'メンバーのパスワードは全て暗号化されています。';
 $lang['ja_JP']['Security']['PASSWORDSENTHEADER'] = 'パスワードリセットのリンクを送信はこちら \'%s\'';
 $lang['ja_JP']['Security']['PASSWORDSENTTEXT'] = '%s へパスワードリセットのメールを送信しました。しばらくしてメールを確認してください。';
-$lang['ja_JP']['Security']['PERMFAILURE'] = ' このページはセキュリティで保護されており、アクセスするにはアドミニストレーターの権限が必要です 
+$lang['ja_JP']['Security']['PERMFAILURE'] = ' このページはセキュリティで保護されており、アクセスするにはアドミニストレーターの権限が必要です
 				証明書キーを下記に入力してください。こちらからすぐに送信します。';
 $lang['ja_JP']['SecurityAdmin']['ADVANCEDONLY'] = 'この部分は、上級者向けです。
 							詳細は <a href="http://doc.silverstripe.com/doku.php?id=permissions:codes" target="_blank">こちらのページ</a>
@@ -500,7 +504,7 @@ $lang['ja_JP']['SiteTree']['METAKEYWORDS'] = 'キーワード';
 $lang['ja_JP']['SiteTree']['METATITLE'] = 'タイトル';
 $lang['ja_JP']['SiteTree']['MODIFIEDONDRAFT'] = 'ドラフトサイトを変更';
 $lang['ja_JP']['SiteTree']['NOBACKLINKS'] = 'このページはどこからもリンクされていません。';
-$lang['ja_JP']['SiteTree']['NOTEUSEASHOMEPAGE'] = '以下のドメインをこの\'ホームページ\'が利用するとする。: 
+$lang['ja_JP']['SiteTree']['NOTEUSEASHOMEPAGE'] = '以下のドメインをこの\'ホームページ\'が利用するとする。:
 							(コンマで複数のドメインを分けてください)';
 $lang['ja_JP']['SiteTree']['PAGESLINKING'] = '次に来るページをこのページにリンクします:';
 $lang['ja_JP']['SiteTree']['PAGETITLE'] = 'ページ名';

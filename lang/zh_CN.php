@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('zh_CN', $lang) && is_array($lang['zh_CN'])) {
 	$lang['zh_CN'] = array_merge($lang['en_US'], $lang['zh_CN']);
 } else {
 	$lang['zh_CN'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['zh_CN']['BasicAuth']['ENTERINFO'] = '请输入用户名和密码';

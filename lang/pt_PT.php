@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('pt_PT', $lang) && is_array($lang['pt_PT'])) {
 	$lang['pt_PT'] = array_merge($lang['en_US'], $lang['pt_PT']);
 } else {
 	$lang['pt_PT'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['pt_PT']['BankAccountField']['VALIDATIONJS'] = 'Por favor introduza um número de conta bancária válido.';
@@ -367,7 +371,7 @@ $lang['pt_PT']['SiteTree']['METAKEYWORDS'] = 'Palavras chave';
 $lang['pt_PT']['SiteTree']['METATITLE'] = 'Título';
 $lang['pt_PT']['SiteTree']['MODIFIEDONDRAFT'] = 'Modificada no site de rascunho';
 $lang['pt_PT']['SiteTree']['NOBACKLINKS'] = 'Não existe nenhuma página com links para esta.';
-$lang['pt_PT']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Usar esta página como a página pré-definida para os seguintes domínios: 
+$lang['pt_PT']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Usar esta página como a página pré-definida para os seguintes domínios:
 							(separar múltiplos domínios por vírgulas)';
 $lang['pt_PT']['SiteTree']['PAGESLINKING'] = 'A seguintes páginas contêm links para esta página:';
 $lang['pt_PT']['SiteTree']['PAGETITLE'] = 'Nome da página';

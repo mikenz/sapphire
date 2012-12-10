@@ -707,7 +707,7 @@ $lang['en_US']['Security']['NOTERESETPASSWORD'] = 'Enter your e-mail address and
 $lang['en_US']['Security']['PASSWORDSENTHEADER'] = 'Password reset link sent to \'%s\'';
 $lang['en_US']['Security']['PASSWORDSENTTEXT'] = 'Thank you! A reset link has been sent to  \'%s\', provided an account exists for this email address.';
 $lang['en_US']['SecurityAdmin']['GROUPNAME'] = 'Group name';
-$lang['en_US']['SecurityAdmin']['IPADDRESSESHELP'] = '<p>You can restrict this group to a particular 
+$lang['en_US']['SecurityAdmin']['IPADDRESSESHELP'] = '<p>You can restrict this group to a particular
 						IP address range (one range per line). <br />Ranges can be in any of the following forms: <br />
 						203.96.152.12<br />
 						203.96.152/24<br />
@@ -808,7 +808,7 @@ $lang['en_US']['SiteTree']['METAHEADER'] = 'Search Engine Meta-tags';
 $lang['en_US']['SiteTree']['METAKEYWORDS'] = 'Keywords';
 $lang['en_US']['SiteTree']['METATITLE'] = 'Title';
 $lang['en_US']['SiteTree']['MODIFIEDONDRAFT'] = 'Modified on draft site';
-$lang['en_US']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Use this page as the \'home page\' for the following domains: 
+$lang['en_US']['SiteTree']['NOTEUSEASHOMEPAGE'] = 'Use this page as the \'home page\' for the following domains:
 							(separate multiple domains with commas)';
 $lang['en_US']['SiteTree']['PAGELOCATION'] = 'Page location';
 $lang['en_US']['SiteTree']['PAGETITLE'] = 'Page name';

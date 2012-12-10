@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('bg_BG', $lang) && is_array($lang['bg_BG'])) {
 	$lang['bg_BG'] = array_merge($lang['en_US'], $lang['bg_BG']);
 } else {
 	$lang['bg_BG'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['bg_BG']['AdvancedSearchForm']['ALLWORDS'] = 'Всички думи';
@@ -380,7 +384,7 @@ $lang['bg_BG']['SiteTree']['DEFAULTABOUTCONTENT'] = '<p>Може да запъл
 $lang['bg_BG']['SiteTree']['DEFAULTABOUTTITLE'] = 'За Нас';
 $lang['bg_BG']['SiteTree']['DEFAULTCONTACTCONTENT'] = '<p>Може да запълните тази страница със собствено съдържание, или да я изтриете и да създадете ваши собствени страници.<br /></p>';
 $lang['bg_BG']['SiteTree']['DEFAULTCONTACTTITLE'] = 'За Контакт';
-$lang['bg_BG']['SiteTree']['DEFAULTHOMECONTENT'] = '<p>Добре дошли в SilverStripe! Това е началната страница подразбиране. Може да промените тази страница отваряйки a href="admin/">CMS системата</a>. Сега можете да влезните в <a href="http://doc.silverstripe.com">документацията на 	
+$lang['bg_BG']['SiteTree']['DEFAULTHOMECONTENT'] = '<p>Добре дошли в SilverStripe! Това е началната страница подразбиране. Може да промените тази страница отваряйки a href="admin/">CMS системата</a>. Сега можете да влезните в <a href="http://doc.silverstripe.com">документацията на
 разработчика</a>, или започнете <a href="http://doc.silverstripe.com/doku.php?id=tutorials">уроците.</a></p';
 $lang['bg_BG']['SiteTree']['DEFAULTHOMETITLE'] = 'Начало';
 $lang['bg_BG']['SiteTree']['EDITANYONE'] = 'Всеки, който може да влезе в CMS';

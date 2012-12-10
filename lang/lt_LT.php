@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('lt_LT', $lang) && is_array($lang['lt_LT'])) {
 	$lang['lt_LT'] = array_merge($lang['en_US'], $lang['lt_LT']);
 } else {
 	$lang['lt_LT'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['lt_LT']['']['NOBACKLINKEDPAGES'] = 'Nėra svetainių susietų su šiuo puslapiu.';
@@ -170,7 +174,7 @@ $lang['lt_LT']['ErrorPage']['503'] = '503 - Servisas nepasiekiamas';
 $lang['lt_LT']['ErrorPage']['504'] = '504 - viršytas laiko limitas';
 $lang['lt_LT']['ErrorPage']['505'] = '505 - nepalaikoma HTTP versija';
 $lang['lt_LT']['ErrorPage']['CODE'] = 'Klaidos kodas';
-$lang['lt_LT']['ErrorPage']['DEFAULTERRORPAGECONTENT'] = '	
+$lang['lt_LT']['ErrorPage']['DEFAULTERRORPAGECONTENT'] = '
 <p>Atsiprašome, atrodo, kad Jūs bandėte patekti į puslapį, kuris neegzistuoja.</p><p>Prašome patikrinti URL adresą ir pabandyti dar kartą.</p>';
 $lang['lt_LT']['ErrorPage']['DEFAULTERRORPAGETITLE'] = 'Puslapis nerastas';
 $lang['lt_LT']['ErrorPage']['ERRORFILEPROBLEM'] = 'Klaida įrašant failo "%s" pakeitimus. Prašome patikrinti failo teises.';
@@ -470,7 +474,7 @@ $lang['lt_LT']['Security']['NOTHINGTOENCRYPT1'] = 'Nėra slaptažodžių užšif
 $lang['lt_LT']['Security']['NOTHINGTOENCRYPT2'] = 'Nėra vartotojų su atviro teksto slaptažodžiais užšifravimui!';
 $lang['lt_LT']['Security']['PASSWORDSENTHEADER'] = 'Slaptažodžio atstatymo nuoroda išsiųssta į \'%s\'';
 $lang['lt_LT']['Security']['PASSWORDSENTTEXT'] = 'Ačiū! Slaptažodžio atstatymo nuoroda išsiųssta į \'%s\'';
-$lang['lt_LT']['Security']['PERMFAILURE'] = '	
+$lang['lt_LT']['Security']['PERMFAILURE'] = '
 Šis puslapis yra apsaugotas ir norint prie jo prieiti Jums reikia gauti administratoriaus teises. Įveskite savo prisijungimo duomenis žemiau ir jums bus išsiųstos prisijungimo teisės.';
 $lang['lt_LT']['SecurityAdmin']['ADVANCEDONLY'] = 'Ši skiltis yra skirta tik pažengusiems vartotojams.
 Daugiau informacijos žr.<a href="http://doc.silverstripe.com/doku.php?id=permissions:codes" target="_blank"> šiame puslapyje</ a>.';

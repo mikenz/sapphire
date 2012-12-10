@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('de_DE', $lang) && is_array($lang['de_DE'])) {
 	$lang['de_DE'] = array_merge($lang['en_US'], $lang['de_DE']);
 } else {
 	$lang['de_DE'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['de_DE']['']['NOBACKLINKEDPAGES'] = 'Keine anderen Seiten sind auf diese Seite verlinkt.';

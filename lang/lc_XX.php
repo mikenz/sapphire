@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('lc_XX', $lang) && is_array($lang['lc_XX'])) {
 	$lang['lc_XX'] = array_merge($lang['en_US'], $lang['lc_XX']);
 } else {
 	$lang['lc_XX'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['lc_XX']['BasicAuth']['ENTERINFO'] = 'PLZ ENTR UR USERNAYM N A PASWORD.';

@@ -6,7 +6,8 @@
  * @subpackage i18n
  */
 
-i18n::include_locale_file('sapphire', 'en_US');
+$en_US_exists = isset($lang['en_US']);
+i18n::include_locale_file('sapphire', 'en_US', true);
 
 global $lang;
 
@@ -14,6 +15,9 @@ if(array_key_exists('da_DK', $lang) && is_array($lang['da_DK'])) {
 	$lang['da_DK'] = array_merge($lang['en_US'], $lang['da_DK']);
 } else {
 	$lang['da_DK'] = $lang['en_US'];
+}
+if (!$en_US_exists) {
+	unset($lang['en_US']);
 }
 
 $lang['da_DK']['']['NOBACKLINKEDPAGES'] = 'Der er ingen sider som linker til denne';
