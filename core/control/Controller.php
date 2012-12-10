@@ -12,17 +12,17 @@
 class Controller extends RequestHandler {
 
 	/**
-	 * @var array $urlParams An array of arguments extracted from the URL 
+	 * @var array $urlParams An array of arguments extracted from the URL
 	 */
 	protected $urlParams;
-	
+
 	/**
 	 * @var array $requestParams Contains all GET and POST parameters
 	 * passed to the current {@link SS_HTTPRequest}.
 	 * @uses SS_HTTPRequest->requestVars()
 	 */
 	protected $requestParams;
-	
+
 	/**
 	 * @var string $action The URL part matched on the current controller as
 	 * determined by the "$Action" part of the {@link $url_handlers} definition.
@@ -31,7 +31,7 @@ class Controller extends RequestHandler {
 	 * action-specific templates.
 	 */
 	protected $action;
-	
+
 	/**
 	 * The {@link Session} object for this controller
 	 */
@@ -42,7 +42,7 @@ class Controller extends RequestHandler {
 	 * Controller::$controller_stack[0] is the current controller.
 	 */
 	protected static $controller_stack = array();
-	
+
 	protected $basicAuthEnabled = true;
 
 	/**
@@ -50,28 +50,28 @@ class Controller extends RequestHandler {
 	 * Set in {@link handleRequest()}.
 	 */
 	protected $response;
-	
+
 	/**
 	 * @var SS_HTTPRequest $request The request object that the controller was called with.
 	 * Set in {@link handleRequest()}. Useful to generate the {}
 	 */
 	protected $request;
-	
+
 	/**
 	 * Default URL handlers - (Action)/(ID)/(OtherID)
 	 */
 	static $url_handlers = array(
 		'$Action//$ID/$OtherID' => 'handleAction',
 	);
-	
+
 	static $allowed_actions = array(
 		'handleAction',
 		'handleIndex',
 	);
-	
+
 	/**
 	 * Initialisation function that is run before any action on the controller is called.
-	 * 
+	 *
 	 * @uses BasicAuth::requireLogin()
 	 */
 	function init() {
@@ -85,59 +85,59 @@ class Controller extends RequestHandler {
 				DB::query("UPDATE \"Member\" SET \"LastVisited\" = " . DB::getConn()->now() . " WHERE \"ID\" = $member->ID", null);
 			}
 		}
-		
+
 		// This is used to test that subordinate controllers are actually calling parent::init() - a common bug
 		$this->baseInitCalled = true;
 	}
-	
+
 	/**
 	 * Executes this controller, and return an {@link SS_HTTPResponse} object with the result.
-	 * 
+	 *
 	 * This method first does a few set-up activities:
-	 *  - Push this controller ont to the controller stack - 
+	 *  - Push this controller ont to the controller stack -
 	 *    see {@link Controller::curr()} for information about this.
 	 *  - Call {@link init()}
 	 *  - Defer to {@link RequestHandler->handleRequest()} to determine which action
 	 *    should be executed
-	 * 
-	 * Note: $requestParams['executeForm'] support was removed, 
-	 * make the following change in your URLs: 
-	 * "/?executeForm=FooBar" -> "/FooBar" 
+	 *
+	 * Note: $requestParams['executeForm'] support was removed,
+	 * make the following change in your URLs:
+	 * "/?executeForm=FooBar" -> "/FooBar"
 	 * Also make sure "FooBar" is in the $allowed_actions of your controller class.
-	 * 
-	 * Note: You should rarely need to overload run() - 
+	 *
+	 * Note: You should rarely need to overload run() -
 	 * this kind of change is only really appropriate for things like nested
-	 * controllers - {@link ModelAsController} and {@link RootURLController} 
+	 * controllers - {@link ModelAsController} and {@link RootURLController}
 	 * are two examples here.  If you want to make more
 	 * orthodox functionality, it's better to overload {@link init()} or {@link index()}.
-	 * 
-	 * Important: If you are going to overload handleRequest, 
+	 *
+	 * Important: If you are going to overload handleRequest,
 	 * make sure that you start the method with $this->pushCurrent()
-	 * and end the method with $this->popCurrent().  
+	 * and end the method with $this->popCurrent().
 	 * Failure to do this will create weird session errors.
-	 * 
-	 * @param $request The {@link SS_HTTPRequest} object that is responsible 
+	 *
+	 * @param $request The {@link SS_HTTPRequest} object that is responsible
 	 *  for distributing request parsing.
-	 * @return SS_HTTPResponse The response that this controller produces, 
+	 * @return SS_HTTPResponse The response that this controller produces,
 	 *  including HTTP headers such as redirection info
 	 */
 	function handleRequest(SS_HTTPRequest $request) {
 		if(!$request) user_error("Controller::handleRequest() not passed a request!", E_USER_ERROR);
-		
+
 		$this->pushCurrent();
 		$this->urlParams = $request->allParams();
 		$this->request = $request;
 		$this->response = new SS_HTTPResponse();
-		
+
 		$this->extend('onBeforeInit');
 
 		// Init
-		$this->baseInitCalled = false;	
+		$this->baseInitCalled = false;
 		$this->init();
 		if(!$this->baseInitCalled) user_error("init() method on class '$this->class' doesn't call Controller::init().  Make sure that you have parent::init() included.", E_USER_WARNING);
 
 		$this->extend('onAfterInit');
-		
+
 		// If we had a redirection or something, halt processing.
 		if($this->response->isFinished()) {
 			$this->popCurrent();
@@ -148,13 +148,13 @@ class Controller extends RequestHandler {
 		if($body instanceof SS_HTTPResponse) {
 			if(isset($_REQUEST['debug_request'])) Debug::message("Request handler returned SS_HTTPResponse object to $this->class controller; returning it without modification.");
 			$this->response = $body;
-			
+
 		} else {
 			if(is_object($body)) {
 				if(isset($_REQUEST['debug_request'])) Debug::message("Request handler $body->class object to $this->class controller;, rendering with template returned by $body->class::getViewer()");
 			   $body = $body->getViewer($request->latestParam('Action'))->process($body);
 			}
-			
+
 			$this->response->setBody($body);
 		}
 
@@ -171,7 +171,7 @@ class Controller extends RequestHandler {
 	 * If $Action isn't given, it will use "index" as a default.
 	 */
 	public function handleAction($request) {
-		// urlParams, requestParams, and action are set for backward compatability 
+		// urlParams, requestParams, and action are set for backward compatability
 		foreach($request->latestParams() as $k => $v) {
 			if($v || !isset($this->urlParams[$k])) $this->urlParams[$k] = $v;
 		}
@@ -179,19 +179,19 @@ class Controller extends RequestHandler {
 		$this->action = str_replace("-","_",$request->param('Action'));
 		$this->requestParams = $request->requestVars();
 		if(!$this->action) $this->action = 'index';
-		
+
 		if(!$this->hasAction($this->action)) {
 			$this->httpError(404, "The action '$this->action' does not exist in class $this->class");
 		}
-		
-		// run & init are manually disabled, because they create infinite loops and other dodgy situations 
+
+		// run & init are manually disabled, because they create infinite loops and other dodgy situations
 		if(!$this->checkAccessAction($this->action) || in_array(strtolower($this->action), array('run', 'init'))) {
 			return $this->httpError(403, "Action '$this->action' isn't allowed on class $this->class");
 		}
-		
+
 		if($this->hasMethod($this->action)) {
 			$result = $this->{$this->action}($request);
-			
+
 			// If the action returns an array, customise with it before rendering the template.
 			if(is_array($result)) {
 				return $this->getViewer($this->action)->process($this->customise($result));
@@ -206,14 +206,14 @@ class Controller extends RequestHandler {
 	function setURLParams($urlParams) {
 		$this->urlParams = $urlParams;
 	}
-	
+
 	/**
 	 * @return array The parameters extracted from the URL by the {@link Director}.
 	 */
 	function getURLParams() {
 		return $this->urlParams;
 	}
-	
+
 	/**
 	 * Returns the SS_HTTPResponse object that this controller is building up.
 	 * Can be used to set the status code and headers
@@ -221,7 +221,7 @@ class Controller extends RequestHandler {
 	function getResponse() {
 		return $this->response;
 	}
-	
+
 	/**
 	 * Get the request with which this controller was called (if any).
 	 * Usually set in {@link handleRequest()}.
@@ -302,11 +302,11 @@ class Controller extends RequestHandler {
 		}
 		return new SSViewer($templates);
 	}
-	
+
 	public function hasAction($action) {
 		return parent::hasAction($action) || $this->hasActionTemplate($action);
 	}
-	
+
 	/**
 	 * Returns TRUE if this controller has a template that is specifically designed to handle a specific action.
 	 *
@@ -315,36 +315,36 @@ class Controller extends RequestHandler {
 	 */
 	public function hasActionTemplate($action) {
 		if(isset($this->templates[$action])) return true;
-		
+
 		$parentClass = $this->class;
 		$templates   = array();
-		
+
 		while($parentClass != 'Controller') {
 			$templates[] = strtok($parentClass, '_') . '_' . $action;
 			$parentClass = get_parent_class($parentClass);
 		}
-		
+
 		return SSViewer::hasTemplate($templates);
 	}
-	
+
 	/**
 	 * Render the current controller with the templates determined
 	 * by {@link getViewer()}.
-	 * 
+	 *
 	 * @param array $params Key-value array for custom template variables (Optional)
-	 * @return string Parsed template content 
+	 * @return string Parsed template content
 	 */
 	function render($params = null) {
 		$template = $this->getViewer($this->getAction());
-	
+
 		// if the object is already customised (e.g. through Controller->run()), use it
 		$obj = ($this->customisedObj) ? $this->customisedObj : $this;
-	
+
 		if($params) $obj = $this->customise($params);
-		
+
 		return $template->process($obj);
 	}
-  
+
 	/**
 	 * Call this to disable site-wide basic authentication for a specific contoller.
 	 * This must be called before Controller::init().  That is, you must call it in your controller's
@@ -365,7 +365,7 @@ class Controller extends RequestHandler {
 			user_error("No current controller available", E_USER_WARNING);
 		}
 	}
-	
+
 	/**
 	 * Tests whether we have a currently active controller or not
 	 * @return boolean True if there is at least 1 controller in the stack.
@@ -454,13 +454,13 @@ class Controller extends RequestHandler {
 			user_error("popCurrent called on $this->class controller, but it wasn't at the top of the stack", E_USER_WARNING);
 		}
 	}
-	
+
 	/**
-	 * Redirct to the given URL.
+	 * Redirect to the given URL.
 	 * It is generally recommended to call Director::redirect() rather than calling this function directly.
 	 */
 	function redirect($url, $code=302) {
-		if($this->response->getHeader('Location')) {
+		if($this->response->getHeader('Location') && $this->response->getHeader('Location') != $url) {
 			user_error("Already directed to " . $this->response->getHeader('Location') . "; now trying to direct to $url", E_USER_WARNING);
 			return;
 		}
@@ -472,7 +472,7 @@ class Controller extends RequestHandler {
 
 		$this->response->redirect($url, $code);
 	}
-	
+
 	/**
 	 * Redirect back. Uses either the HTTP_REFERER or a manually set request-variable called
 	 * _REDIRECT_BACK_URL.
@@ -499,15 +499,15 @@ class Controller extends RequestHandler {
 		}
 
 	}
-	
+
 	/**
 	 * Tests whether a redirection has been requested.
 	 * @return string If redirect() has been called, it will return the URL redirected to.  Otherwise, it will return null;
 	 */
 	function redirectedTo() {
 		return $this->response->getHeader('Location');
-	} 
-	
+	}
+
 	/**
 	 * Get the Session object representing this Controller's session
 	 * @return Session
@@ -515,14 +515,14 @@ class Controller extends RequestHandler {
 	function getSession() {
 		return $this->session;
 	}
-	
+
 	/**
 	 * Set the Session object.
 	 */
 	function setSession(Session $session) {
 		$this->session = $session;
 	}
-	
+
 	/**
 	 * Returns true if this controller is processing an ajax request
 	 * @return boolean True if this controller is processing an ajax request
@@ -533,16 +533,16 @@ class Controller extends RequestHandler {
 			(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == "XMLHttpRequest")
 		);
 	}
-	
+
 	/**
 	 * Joins two or more link segments together, putting a slash between them if necessary.
 	 * Use this for building the results of {@link Link()} methods.
-	 * If either of the links have query strings, 
+	 * If either of the links have query strings,
 	 * then they will be combined and put at the end of the resulting url.
-	 * 
+	 *
 	 * Caution: All parameters are expected to be URI-encoded already.
-	 * 
-	 * @param String 
+	 *
+	 * @param String
 	 * @return String
 	 */
 	static function join_links() {
@@ -565,10 +565,10 @@ class Controller extends RequestHandler {
 				else $result .= (substr($result, -1) == '/' && $arg[0] == '/') ? ltrim($arg, '/') : $arg;
 			}
 		}
-		
+
 		if($querystrings) $result .= '?' . implode('&', $querystrings);
 		if($fragmentIdentifier) $result .= "#$fragmentIdentifier";
-		
+
 		return $result;
 	}
 }
