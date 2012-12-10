@@ -1,18 +1,18 @@
 <?php
 /**
  * Base-class for storage and retrieval of translated entities.
- * 
+ *
  * Please see the {@link Translatable} extension for managing translations of database-content.
- * 
+ *
  * <b>Usage</b>
- * 
+ *
  * PHP:
  * <code>
  * _t('MyNamespace.MYENTITY', 'My default natural language value');
  * _t('MyNamespace.MYENTITY', 'My default natural language value', PR_MEDIUM, 'My explanatory context');
  * sprintf(_t('MyNamespace.MYENTITY', 'Counting %s things'), 42);
  * </code>
- * 
+ *
  * Templates:
  * <code>
  * <% _t('MyNamespace.MYENTITY', 'My default natural language value') %>
@@ -23,33 +23,33 @@
  * <code>
  * ss.i18n._t('MyEntity.MyNamespace','My default natural language value');
  * </code>
- * 
+ *
  * File-based i18n-translations always have a "locale" (e.g. 'en_US').
  * Common language names (e.g. 'en') are mainly used in {@link Translatable} for
  * database-entities.
- * 
+ *
  * <b>Text Collection</b>
- * 
+ *
  * Features a "textcollector-mode" that parses all files with a certain extension
  * (currently *.php and *.ss) for new translatable strings. Textcollector will write
  * updated string-tables to their respective folders inside the module, and automatically
  * namespace entities to the classes/templates they are found in (e.g. $lang['en_US']['AssetAdmin']['UPLOADFILES']).
- * 
+ *
  * Caution: Does not apply any character-set conversion, it is assumed that all content
  * is stored and represented in UTF-8 (Unicode). Please make sure your files are created with the correct
  * character-set, and your HTML-templates render UTF-8.
- * 
+ *
  * Caution: The language file has to be stored in the same module path as the "filename namespaces"
  * on the entities. So an entity stored in $lang['en_US']['AssetAdmin']['DETAILSTAB'] has to
  * in the language file cms/lang/en_US.php, as the referenced file (AssetAdmin.php) is stored
  * in the "cms" module.
- * 
+ *
  * <b>Locales</b>
  *
- * For the i18n class, a "locale" consists of a language code plus a region code separated by an underscore, 
+ * For the i18n class, a "locale" consists of a language code plus a region code separated by an underscore,
  * for example "de_AT" for German language ("de") in the region Austria ("AT").
  * See http://www.w3.org/International/articles/language-tags/ for a detailed description.
- * 
+ *
  * @see http://doc.silverstripe.org/i18n
  * @see http://www.w3.org/TR/i18n-html-tech-lang
  *
@@ -58,32 +58,32 @@
  * @subpackage misc
  */
 class i18n extends Object {
-	
+
 	/**
 	 * This static variable is used to store the current defined locale.
 	 */
 	protected static $current_locale = '';
-	
+
 	/**
 	 * @var string
 	 */
 	protected static $default_locale = 'en_US';
-	
+
 	/**
 	 * @var boolean
 	 */
 	protected static $js_i18n = true;
-	
+
 	/**
 	 * @var string
 	 */
 	protected static $date_format;
-	
+
 	/**
 	 * @var string
 	 */
 	protected static $time_format;
-	
+
 	/**
 	 * Use javascript i18n through the ss.i18n class (enabled by default).
 	 * If set to TRUE, includes javascript requirements for the base library
@@ -95,29 +95,29 @@ class i18n extends Object {
 	 *
 	 * Caution: This flag gets overwritten in {@link LeftAndMain::init()} to enforce javascript
 	 * i18n for the CMS interfaces.
-	 * 
-	 * @see Requirements::process_i18n_javascript() 
+	 *
+	 * @see Requirements::process_i18n_javascript()
 	 *
 	 * @param bool $bool
 	 */
 	public static function set_js_i18n($bool) {
 		self::$js_i18n = $bool;
 	}
-	
+
 	/**
 	 * @return bool
 	 */
 	public static function get_js_i18n() {
 		return self::$js_i18n;
 	}
-	
+
 	/**
 	 * @param string ISO date format
 	 */
 	public static function set_date_format($format) {
 		self::$date_format = $format;
 	}
-	
+
 	/**
 	 * @return string ISO date format
 	 */
@@ -125,14 +125,14 @@ class i18n extends Object {
 		require_once 'Zend/Date.php';
 		return (self::$date_format) ? self::$date_format : Zend_Locale_Format::getDateFormat(self::get_locale());
 	}
-	
+
 	/**
 	 * @param string ISO time format
 	 */
 	public static function set_time_format($format) {
 		self::$time_format = $format;
 	}
-	
+
 	/**
 	 * @return string ISO time format
 	 */
@@ -140,7 +140,7 @@ class i18n extends Object {
 		require_once 'Zend/Date.php';
 		return (self::$time_format) ? self::$time_format : Zend_Locale_Format::getTimeFormat(self::get_locale());
 	}
-	
+
 	/**
 	 * An exhaustive list of possible locales (code => language and country)
 	 *
@@ -626,7 +626,7 @@ class i18n extends Object {
 			'zh_yue' => 'Chinese (Cantonese)',
 			'zu_ZA' => 'Zulu (South Africa)'
 	);
-	
+
 	/**
 	 * @var array $common_languages A list of commonly used languages, in the form
 	 * langcode => array( EnglishName, NativeName)
@@ -717,7 +717,7 @@ class i18n extends Object {
 		'yi' => array('Yiddish', '&#1522;&#1460;&#1491;&#1497;&#1513;'),
 		'zu' => array('Zulu', 'isiZulu')
 	);
-	
+
 	/**
 	 * @var array $common_locales
 	 * Sorted alphabtically by the common language name,
@@ -807,7 +807,7 @@ class i18n extends Object {
 		'xh_ZA' => array('Xhosa', 'isiXhosa'),
 		'zu_ZA' => array('Zulu', 'isiZulu'),
 	);
-	
+
 	static $tinymce_lang = array(
 		'ca_AD' => 'ca',
 		'ca_ES' => 'ca',
@@ -970,7 +970,7 @@ class i18n extends Object {
 		'zh_US' => 'zn_cn',
 
 	);
-	
+
 	/**
 	 * @var array $likely_subtags Provides you "likely locales"
 	 * for a given "short" language code. This is a guess,
@@ -1437,7 +1437,7 @@ class i18n extends Object {
 		'zh_TW' => 'zh_TW',
 		'zu' => 'zu_ZA',
 	);
-	
+
 	/**
 	 * This is the main translator function. Returns the string defined by $class and $entity according to the currently set locale.
 	 *
@@ -1454,7 +1454,7 @@ class i18n extends Object {
 	 */
 	static function _t($entity, $string = "", $priority = 40, $context = "") {
 		global $lang;
-		
+
 		// get current locale (either default or user preference)
 		$locale = i18n::get_locale();
 
@@ -1462,9 +1462,9 @@ class i18n extends Object {
 		$entityParts = explode('.',$entity);
 		$realEntity = array_pop($entityParts);
 		$class = implode('.',$entityParts);
-		
+
 		// if language table isn't loaded for this locale, get it for each of the modules
-		if(!isset($lang[$locale])) i18n::include_by_locale($locale);
+		if(!isset($lang[$locale])) i18n::include_by_locale($locale, true, true);
 
 		// fallback to the passed $string if no translation is present
 		$transEntity = isset($lang[$locale][$class][$realEntity]) ? $lang[$locale][$class][$realEntity] : $string;
@@ -1486,7 +1486,7 @@ class i18n extends Object {
 		}
 		return $languages;
 	}
-	
+
 	/**
 	 * Get a list of commonly used locales
 	 *
@@ -1500,7 +1500,7 @@ class i18n extends Object {
 		}
 		return $languages;
 	}
-	
+
 	/**
 	 * Get a list of locales (code => language and country)
 	 *
@@ -1509,22 +1509,22 @@ class i18n extends Object {
 	static function get_locale_list() {
 		return self::$all_locales;
 	}
-	
+
 	/**
 	 * Searches the root-directory for module-directories
 	 * (identified by having a _config.php on their first directory-level).
 	 * Returns all found locales.
-	 * 
+	 *
 	 * @return array
 	 */
 	static function get_existing_translations() {
 		$locales = array();
-		
+
 		$baseDir = Director::baseFolder();
 		$modules = scandir($baseDir);
 		foreach($modules as $module) {
 			if($module[0] == '.') continue;
-			
+
 			$moduleDir = $baseDir . DIRECTORY_SEPARATOR . $module;
 			$langDir = $moduleDir . DIRECTORY_SEPARATOR . "lang";
 			if(is_dir($moduleDir) && is_file($moduleDir . DIRECTORY_SEPARATOR . "_config.php") && is_dir($langDir)) {
@@ -1535,19 +1535,19 @@ class i18n extends Object {
 							$locales[$matches[1]] = self::$all_locales[$matches[1]];
 						}
 					}
-				} 
+				}
 			}
 		}
 
 		// sort by title (not locale)
 		asort($locales);
-		
+
 		return $locales;
 	}
-	
+
 	/**
 	 * Get a name from a language code (two characters, e.g. "en").
-	 * 
+	 *
 	 * @see get_locale_name()
 	 *
 	 * @param mixed $code Language code
@@ -1562,10 +1562,10 @@ class i18n extends Object {
 			return (isset($langs[$code][0])) ? $langs[$code][0] : false;
 		}
 	}
-	
+
 	/**
 	 * Get a name from a locale code (xx_YY).
-	 * 
+	 *
 	 * @see get_language_name()
 	 *
 	 * @param mixed $code locale code
@@ -1575,7 +1575,7 @@ class i18n extends Object {
 		$langs = self::get_locale_list();
 		return isset($langs[$code]) ? $langs[$code] : false;
 	}
-	
+
 	/**
 	 * Get a code from an English language name
 	 *
@@ -1586,36 +1586,36 @@ class i18n extends Object {
 		$code = array_search($name,self::get_common_languages());
 		return ($code ? $code : $name);
 	}
-	
+
 	/**
 	 * Get the current tinyMCE language
-	 * 
+	 *
 	 * @return Language
 	 */
 	static function get_tinymce_lang() {
 		if(isset(self::$tinymce_lang[self::get_locale()])) {
 			return self::$tinymce_lang[self::get_locale()];
 		}
-		
+
 		return 'en';
 	}
-	
+
 	/**
 	 * Searches the root-directory for module-directories
 	 * (identified by having a _config.php on their first directory-level
 	 * and a language-file with the default locale in the /lang-subdirectory).
-	 * 
+	 *
 	 * @return array
 	 */
 	static function get_translatable_modules() {
 		$translatableModules = array();
-		
+
 		$baseDir = Director::baseFolder();
 		$modules = scandir($baseDir);
 		foreach($modules as $module) {
 			$moduleDir = $baseDir . DIRECTORY_SEPARATOR . $module;
 			if(
-				is_dir($moduleDir) 
+				is_dir($moduleDir)
 				&& is_file($moduleDir . DIRECTORY_SEPARATOR . "_config.php")
 				&& is_file($moduleDir . DIRECTORY_SEPARATOR . "lang" . DIRECTORY_SEPARATOR . self::$default_locale . ".php")
 			) {
@@ -1624,16 +1624,16 @@ class i18n extends Object {
 		}
 		return $translatableModules;
 	}
-	
+
 	/**
 	 * Returns the "short" language name from a locale,
 	 * e.g. "en_US" would return "en". This conversion
 	 * is determined internally by the {@link $tinymce_lang}
 	 * lookup table. If no match can be found in this lookup,
 	 * the characters before the underscore ("_") are returned.
-	 * 
+	 *
 	 * @todo More generic lookup table, don't rely on tinymce specific conversion
-	 * 
+	 *
 	 * @param string $locale E.g. "en_US"
 	 * @return string Short language code, e.g. "en"
 	 */
@@ -1644,7 +1644,7 @@ class i18n extends Object {
 			return preg_replace('/(_|-).*/', '', $locale);
 		}
 	}
-	
+
 	/**
 	 * Provides you "likely locales"
 	 * for a given "short" language code. This is a guess,
@@ -1652,7 +1652,7 @@ class i18n extends Object {
 	 * could also mean "en_UK". Based on the Unicode CLDR
 	 * project.
 	 * @see http://www.unicode.org/cldr/data/charts/supplemental/likely_subtags.html
-	 * 
+	 *
 	 * @param string $lang Short language code, e.g. "en"
 	 * @return string Long locale, e.g. "en_US"
 	 */
@@ -1665,25 +1665,25 @@ class i18n extends Object {
 			return $lang . '_' . strtoupper($lang);
 		}
 	}
-	
+
 	/**
 	 * Gets a RFC 1766 compatible language code,
 	 * e.g. "en-US".
 	 *
 	 * @see http://www.ietf.org/rfc/rfc1766.txt
 	 * @see http://tools.ietf.org/html/rfc2616#section-3.10
-	 * 
+	 *
 	 * @param string $locale
 	 * @return string
 	 */
 	static function convert_rfc1766($locale) {
 		return str_replace('_','-', $locale);
 	}
-	
+
 	/**
 	 * Given a file name (a php class name, without the .php ext, or a template name, including the .ss extension)
 	 * this helper function determines the module where this file is located
-	 * 
+	 *
 	 * @param string $name php class name or template file name (including *.ss extension)
 	 * @return string Module where the file is located
 	 */
@@ -1697,11 +1697,11 @@ class i18n extends Object {
 			} else {
 				$absolutePath = $templateManifest;
 			}
-			
+
 			$path = str_replace('\\','/',Director::makeRelative(current($absolutePath)));
-			
+
 			ereg('/([^/]+)/',$path,$module);
-		} 
+		}
 		// $name is assumed to be a PHP class
 		else {
 			global $_CLASS_MANIFEST;
@@ -1715,19 +1715,19 @@ class i18n extends Object {
 		return (isset($module)) ? $module[1] : false;
 
 	}
-	
+
 	/**
 	 * Validates a "long" locale format (e.g. "en_US")
 	 * by checking it against {@link $all_locales}.
-	 * 
+	 *
 	 * To add a locale to {@link $all_locales}, use the following example
 	 * in your mysite/_config.php:
 	 * <code>
 	 * i18n::$allowed_locales['xx_XX'] = '<Language name>';
 	 * </code>
-	 * 
+	 *
 	 * Note: Does not check for {@link $allowed_locales}.
-	 * 
+	 *
 	 * @return boolean
 	 */
 	static function validate_locale($locale) {
@@ -1737,32 +1737,32 @@ class i18n extends Object {
 	}
 
 	/**
-	 * Set the current locale, used as the default for 
+	 * Set the current locale, used as the default for
 	 * any localized classes, such as {@link FormField} or {@link DBField}
 	 * instances. Locales can also be persisted in {@link Member->Locale},
 	 * for example in the {@link CMSMain} interface the Member locale
 	 * overrules the global locale value set here.
-	 * 
+	 *
 	 * See {@link Translatable::set_locale()}.
-	 * 
+	 *
 	 * @param string $locale Locale to be set. See http://unicode.org/cldr/data/diff/supplemental/languages_and_territories.html for a list of possible locales.
 	 */
 	static function set_locale($locale) {
 		if(!self::validate_locale($locale)) throw new InvalidArgumentException(sprintf('Invalid locale "%s"', $locale));
-		
+
 		if ($locale) self::$current_locale = $locale;
 	}
 
 	/**
 	 * Get the current locale.
 	 * Used by {@link Member::populateDefaults()}
-	 * 
+	 *
 	 * @return string Current locale in the system
 	 */
 	static function get_locale() {
 		return (!empty(self::$current_locale)) ? self::$current_locale : self::$default_locale;
 	}
-	
+
 	/**
 	 * @deprecated 2.4 Use Translatable::set_default_locale() or i18n::set_default_locale()
 	 * @param $lang String
@@ -1770,7 +1770,7 @@ class i18n extends Object {
 	static function set_default_lang($lang) {
 		Translatable::set_default_lang($lang);
 	}
-	
+
 	/**
 	 * @deprecated 2.4 Use Translatable::default_locale() or i18n::default_locale()
 	 * @return String
@@ -1778,38 +1778,38 @@ class i18n extends Object {
 	static function default_lang() {
 		return Translatable::default_locale();
 	}
-	
+
 	/**
 	 * This is the "fallback locale", in case resources with the "current locale"
 	 * (set through {@link set_locale()}) can't be found.
-	 * 
+	 *
 	 * If you just want to globally read/write a different locale (e.g. in a CMS interface),
 	 * please use {@link get_locale()} and {@link set_locale()} instead.
-	 * 
+	 *
 	 * For example, {@link Requirements::add_i18n_javascript()} and {@link i18n::include_by_class()}
 	 * use this "fallback locale" value to include fallback language files.
-	 * 
+	 *
 	 * @return String
 	 */
 	static function default_locale() {
 		return self::$default_locale;
 	}
-	
+
 	/**
 	 * See {@link default_locale()} for usage.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param String $locale
 	 */
 	static function set_default_locale($locale) {
 		if(!self::validate_locale($locale)) throw new InvalidArgumentException(sprintf('Invalid locale "%s"', $locale));
-		
+
 		self::$default_locale = $locale;
 	}
-	
+
 	/**
 	 * Enables the multilingual content feature (proxy for Translatable::enable()).
-	 * 
+	 *
 	 * @deprecated 2.4 Use Object::add_extension('Page', 'Translatable');
 	 */
 	static function enable() {
@@ -1818,7 +1818,7 @@ class i18n extends Object {
 
 	/**
 	 * Disable the multilingual content feature (proxy for Translatable::disable())
-	 * 
+	 *
 	 * @deprecated 2.4 Use Object::add_extension('Page', 'Translatable');
 	 */
 	static function disable() {
@@ -1826,30 +1826,33 @@ class i18n extends Object {
 	}
 
 	/**
-	 * Include a locale file determined by module name and locale 
-	 * 
+	 * Include a locale file determined by module name and locale
+	 *
 	 * @param string $module Module that contains the locale file
 	 * @param string $locale Locale to be loaded
 	 */
-	static function include_locale_file($module, $locale) {
+	static function include_locale_file($module, $locale, $force_load = false) {
 		if(!self::validate_locale($locale)) throw new InvalidArgumentException(sprintf('Invalid locale "%s"', $locale));
-		
-		if (file_exists($file = Director::getAbsFile("$module/lang/$locale.php"))) include_once($file);
+
+		if (file_exists($file = Director::getAbsFile("$module/lang/$locale.php"))) {
+			if ($force_load) include($file);
+			else include_once($file);
+		}
 	}
 
 	/**
 	 * Includes all available language files for a certain defined locale
-	 * 
+	 *
 	 * @param string $locale All resources from any module in locale $locale will be loaded
 	 * @param boolean $load_plugins		If true (default), load extra translations from registered plugins
 	 * @param boolean $force_load		If true (not default), we force the inclusion. Generally this should be off
 	 * 									for performance, but enabling this is useful for interfaces like
 	 * 									CustomTranslationAdmin which need to load more than the usual locales,
-	 * 									and may need to reload them. 
+	 * 									and may need to reload them.
 	 */
 	static function include_by_locale($locale, $load_plugins = true, $force_load = false) {
 		if(!self::validate_locale($locale)) throw new InvalidArgumentException(sprintf('Invalid locale "%s"', $locale));
-		
+
 		global $lang;
 
 		$base = Director::baseFolder();
@@ -1863,14 +1866,14 @@ class i18n extends Object {
 
 			if (
 				is_dir("$base/$module")
-				&& file_exists("$base/$module/_config.php") 
+				&& file_exists("$base/$module/_config.php")
 			  && file_exists($file = "$base/$module/lang/$locale.php")
 			) {
 				if ($force_load) include($file);
 				else include_once($file);
 			}
 		}
-		
+
 		// Load translations from themes
 		$themesBase = $base . '/themes';
 		if(is_dir($themesBase)) {
@@ -1878,7 +1881,7 @@ class i18n extends Object {
 				if(
 					strpos($theme, SSViewer::current_theme()) === 0
 					&& file_exists($file = "$themesBase/$theme/lang/$locale.php")
-				) {				
+				) {
 					if ($force_load) include($file);
 					else include_once($file);
 				}
@@ -1893,7 +1896,7 @@ class i18n extends Object {
 	 * Given a class name (a "locale namespace"), will search for its module and, if available,
 	 * will load the resources for the currently defined locale.
 	 * If not available, the original English resource will be loaded instead (to avoid blanks)
-	 * 
+	 *
 	 * @param string $class Resources for this class will be included, according to the set locale.
 	 */
 	static function include_by_class($class) {
@@ -1901,11 +1904,11 @@ class i18n extends Object {
 
 		if(!$module) user_error("i18n::include_by_class: Class {$class} not found", E_USER_WARNING);
 		$locale = self::get_locale();
-		
+
 		if (file_exists($file = Director::getAbsFile("$module/lang/". self::get_locale() . '.php'))) {
 			include($file);
 		} else if (self::get_locale() != self::$default_locale) {
-		        $old = self::get_locale();
+				$old = self::get_locale();
 			self::set_locale(self::$default_locale);
 			self::include_by_class($class);
 			self::set_locale($old);
@@ -1918,11 +1921,11 @@ class i18n extends Object {
 		// this method from being called again
 		global $lang;
 		if(!isset($lang[$locale][$class])) $lang[$locale][$class] = array();
-		
+
 	}
-	
+
 	//-----------------------------------------------------------------------------------------------//
-	
+
 	/**
 	 * This method will delete every SiteTree instance in the given language
 	 */
