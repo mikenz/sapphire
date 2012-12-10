@@ -1,7 +1,7 @@
 /**
- * Javascript for TableField. allows the deletion of records via 
+ * Javascript for TableField. allows the deletion of records via
  * AJAX, and the addition of rows via javasript.
- * 
+ *
  * TODO relies on include-order at the moment to override actions :/
  */
 Effect.FadeOut = function(element,callback) {
@@ -11,36 +11,36 @@ Effect.FadeOut = function(element,callback) {
   from: Element.getOpacity(element) || 1.0,
   to:   0.0,
   afterFinishInternal: function(effect) {
-  	effect.element.parentNode.removeChild(effect.element);
+	effect.element.parentNode.removeChild(effect.element);
   }
   }, arguments[1] || {});
   return new Effect.Opacity(element,options);
 }
- 
+
 TableField = Class.create();
 TableField.prototype = {
-	
+
 	newRowID: 1,
-	
+
 	/**
 	 * Applies behaviour to the delete button for deleting objects via ajax.
 	 */
 	initialize: function() {
 		var rules = {};
-		
+
 		rules['#'+this.id+' table.data a.deletelink'] = {
 			onclick: this.deleteRecord.bind(this)
 		};
-		
+
 		rules['#'+this.id+' table.data a.addrow'] = {
 			onclick: this.addRow.bind(this)
 		};
-		
+
 		Behaviour.register('TableField_'+this.id,rules);
 	},
-	
+
 	/**
-	 * Deletes the given dataobject record via an ajax request. If the record doesn't have any 
+	 * Deletes the given dataobject record via an ajax request. If the record doesn't have any
 	 * information in it, it just removes it from the form.
 	 * to tablefield->Delete()
 	 * @param {Object} e
@@ -52,7 +52,7 @@ TableField.prototype = {
 		var params = link.getAttribute("href").toQueryParams();
 		var isEmpty = true;
 		var recordID = row.getRecordId();
-		
+
 		// Check to see if there is a dataobject to delete first, otherwise remove the row.
 		// or: Check if a childID is set (not present on new items)
 		if(
@@ -72,7 +72,7 @@ TableField.prototype = {
 			Event.stop(e);
 			return false;
 		}
-		
+
 		// TODO ajaxErrorHandler and loading-image are dependent on cms, but formfield is in sapphire
 		var confirmed = confirm(ss.i18n._t('TABLEFIELD.DELETECONFIRMMESSAGE', 'Are you sure you want to delete this record?'));
 		if(confirmed){
@@ -80,7 +80,7 @@ TableField.prototype = {
 			new Ajax.Request(
 				link.getAttribute("href"),
 				{
-					method: 'post', 
+					method: 'post',
 					postBody: 'ajax=1' + ($('SecurityID') ? '&SecurityID=' + $('SecurityID').value : ''),
 					onComplete: function(response){
 						Effect.Fade(
@@ -105,16 +105,16 @@ TableField.prototype = {
 		Event.stop(e);
 		return false;
 	},
-	
+
 	/**
-	 * 
-	 * 
+	 *
+	 *
 	 * @param {Object} element
 	 * @param {Object} tagName
 	 */
 	hasNoValues: function(element,tagName){
 		elements = element.getElementsByTagName(tagName);
-		
+
 		if(elements.length >= 1){
 			var isEmpty = true;
 			for(var i = 0; i < elements.length;i++){
@@ -124,28 +124,28 @@ TableField.prototype = {
 					}
 				}
 			}
-			
+
 			return isEmpty;
 		}else{
 			return true;
 		}
 	},
-	
-	
+
+
 	/**
-	 * Appends a new row to the DOM. 
-	 * 
+	 * Appends a new row to the DOM.
+	 *
 	 * @param {Object} tableid
-	 */	
+	 */
 	addRow: function (e){
-	
+
 		var table = Event.findElement(e,"table");
 		if(table){
 			// Clone the last TR
 			var tbody = table.tBodies[0];
 			var numRows = tbody.rows.length;
 			var newRow = tbody.rows[0].cloneNode(true);
-			   
+
 			// Get the input elements in this new row
 			var inputs = newRow.getElementsByTagName('input');
 			// For every input, set it's value to blank if it is not hidden
@@ -154,47 +154,49 @@ TableField.prototype = {
 					inputs[i].value = ""
 				};
 			}
-			
+
 			this.newRowID++;
-			
+
 			if(newRow.id != "new"){
 				this.resetNames(newRow);
 			}
-			
+
 			// Make sure all inputs have unique IDs
 			for(var i = 0; i < inputs.length; i++) {
 				inputs[i].id += "-" + this.newRowID;
 			}
-			
+
 			// Change the ID to a unique one
 			newRow.id = "New_" + this.newRowID;
-			
+
 			// Append the new row to the DOM
 			table.tBodies[0].appendChild(newRow);
 			Behaviour.apply(table);
 		}
 		Event.stop(e);
 	},
-	
+
 	/**
 	 * resets the names for all elements inside a row.
 	 * @param {Object} row
 	 */
 	resetNames: function(row){
-		
+
 		// Support for addressing the ID's appropriately.
 		for(i = 0; i < row.cells.length;i++){
-			for(b=0; b < row.cells[i].childNodes.length;b++){
-				inputElement = row.cells[i].childNodes[b];
-				if(inputElement.type != 'hidden') inputElement.value = "";
+			cellInputs = row.cells[i].getElementsByTagName('input');
+			for(b=0; b < cellInputs.length;b++){
+				inputElement = cellInputs[b];
+
+				if(inputElement.type != 'hidden' && inputElement.type != 'checkbox') inputElement.value = "";
 				if(inputElement.name != null){
 					if(inputElement.name.substr(inputElement.name.length - 2,inputElement.name.length) != "[]"){
-						inputElement.name = 
-							inputElement.name.substr(0,inputElement.name.indexOf('[')+1) + "new" +	
+						inputElement.name =
+							inputElement.name.substr(0,inputElement.name.indexOf('[')+1) + "new" +
 							inputElement.name.substr(inputElement.name.indexOf(']'),inputElement.name.length) + "[]";
 					}else{
-						inputElement.name = 
-							inputElement.name.substr(0,inputElement.name.indexOf('[')+1) + "new" +	
+						inputElement.name =
+							inputElement.name.substr(0,inputElement.name.indexOf('[')+1) + "new" +
 							inputElement.name.substr(inputElement.name.indexOf(']'),inputElement.name.length);
 					}
 				}
